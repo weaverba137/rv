@@ -1,0 +1,107 @@
+{% extends "master.html" %}
+{% block content %}
+<div class="col-md-12">
+<h2 id="intro">Introduction</h2>
+<p>Data were obtained with this query:</p>
+<pre>
+SELECT aspcap.apstar_id, aspcap.teff, aspcap.logg, aspcap.param_m_h,
+  star.vhelio_avg, star.vscatter, star.verr, star.verr_med,
+  visit.visit_id, visit.ra, visit.dec, visit.glon, visit.glat,
+  visit.snr, visit.jd, visit.vhelio, visit.vrelerr
+INTO MyDB.apogee_vrel
+FROM apogeeVisit     AS visit
+JOIN apogeeStarVisit AS starvisit ON visit.visit_id   = starvisit.visit_id
+JOIN aspcapStar      AS aspcap    ON aspcap.apstar_id = starvisit.apstar_id
+JOIN apogeeStar      AS star      ON star.apstar_id   = starvisit.apstar_id
+WHERE (aspcap.aspcapflag   &amp; dbo.fApogeeAspcapFlag('STAR_BAD')) = 0
+  AND (star.apogee_target1 &amp; dbo.fApogeeTarget1('APOGEE_LONG')) &gt; 0
+  AND aspcap.teff &gt; 0
+  AND star.nvisits &gt; 5
+ORDER BY aspcap.apstar_id, visit.jd;
+</pre>
+<h2 id="diag">Diagnostic Plots</h2>
+<p>Placeholder.</p>
+<h2 id="min">Minimization</h2>
+<h3 id="model">The Model</h3>
+<p>The data are radial velocities, \(v_n\) as a function of time, \(t_n\).  We take the model to be
+
+\[ m(t_n) = v_0 + A \sin \omega t_n + B \cos \omega t_n \]
+
+The derivatives are
+
+\[ \frac{\partial m}{\partial v_0} = 1 \]
+
+\[ \frac{\partial m}{\partial A} = \sin \omega t \]
+
+\[ \frac{\partial m}{\partial B} = \cos \omega t \]
+
+\[ \frac{\partial m}{\partial \omega} = A t \cos \omega t - B t \sin \omega t \]
+
+This model has only a handful of non-trivial second derivatives.
+
+\[ \frac{\partial^2 m}{\partial v_0^2} = \frac{\partial^2 m}{\partial A^2} = \frac{\partial^2 m}{\partial B^2} = 0 \]
+
+\[ \frac{\partial^2 m}{\partial \omega^2} = -A t^2 \sin \omega t - B t^2 \cos \omega t \]
+
+\[ \frac{\partial^2 m}{\partial A \partial v_0} = \frac{\partial^2 m}{\partial v_0 \partial A} = 0 \]
+
+\[ \frac{\partial^2 m}{\partial B \partial v_0} = \frac{\partial^2 m}{\partial v_0 \partial B} = 0 \]
+
+\[ \frac{\partial^2 m}{\partial \omega \partial v_0} = \frac{\partial^2 m}{\partial v_0 \partial \omega} = 0 \]
+
+\[ \frac{\partial^2 m}{\partial A \partial B} = \frac{\partial^2 m}{\partial B \partial A} = 0 \]
+
+\[ \frac{\partial^2 m}{\partial A \partial \omega} = \frac{\partial^2 m}{\partial \omega \partial A} = t \cos \omega t \]
+
+\[ \frac{\partial^2 m}{\partial B \partial \omega} = \frac{\partial^2 m}{\partial \omega \partial B} = -t \sin \omega t \]
+</p>
+<h2 id="chi2">Simple &chi;<sup>2</sup></h2>
+<p>
+For simplicity, let's start with the basic \(\chi^2\)
+
+\[ \chi^2 = \sum_n \chi_n^2 \]
+
+where
+
+\[ \chi_n = \frac{v_n - m(t_n)}{\sigma_n} \]
+
+To speed up minimization, we want the first and second derivatives with respect to the parameters, \(p_i = v_0, A, B, \omega\), in that order.
+
+\[ \frac{\partial \chi^2}{\partial p_i} = \sum_n \frac{\partial \chi_n^2}{\partial p_i} \]
+
+\[ \frac{\partial \chi_n^2}{\partial p_i} = 2 \chi_n \frac{\partial \chi_n}{\partial p_i} = -\frac{2 \chi_n}{\sigma_n}\frac{\partial m}{\partial p_i} \]
+
+\[ \frac{\partial^2 \chi^2}{\partial p_j \partial p_i} = \sum_n \frac{\partial^2 \chi_n^2}{\partial p_j \partial p_i} \]
+
+\[ \frac{\partial^2 \chi_n^2}{\partial p_j \partial p_i} = \frac{\partial}{\partial p_j} \left( -\frac{2 \chi_n}{\sigma_n}\frac{\partial m}{\partial p_i} \right) = - \frac{2}{\sigma_n} \left( \frac{\partial \chi_n}{\partial p_j} \frac{\partial m}{\partial p_i} + \chi_n \frac{\partial^2 m}{\partial p_j \partial p_i} \right) = \frac{2}{\sigma_n^2}\frac{\partial m}{\partial p_j} \frac{\partial m}{\partial p_i} - \frac{2\chi_n}{\sigma_n} \frac{\partial^2 m}{\partial p_j \partial p_i} \]
+</p>
+<h2 id="other">Other Objectives</h2>
+<p>
+We consider an objective function that is robust against outliers.
+
+\[ \tilde{\chi}^2 = \sum_n f^2(\chi_n) \]
+
+where
+
+\[ f^2(\chi_n) = \frac{Q\chi_n^2}{\chi_n^2 + Q} \]
+
+Then the derivative with respect to \(p_i\) is
+
+\[ \frac{\partial \tilde{\chi}^2}{\partial p_i} = \sum_n \frac{\partial f^2}{\partial p_i} \]
+
+\[ \frac{\partial f^2}{\partial p_i} = \frac{(\chi_n^2 + Q) Q \frac{\partial \chi_n^2}{\partial p_i} - Q \chi_n^2 \frac{\partial \chi_n^2}{\partial p_i}}{(\chi_n^2 + Q)^2} = \frac{Q^2}{(\chi_n^2 + Q)^2}\frac{\partial \chi_n^2}{\partial p_i} = - \frac{2 \chi_n}{\sigma_n}\frac{Q^2}{(\chi_n^2 + Q)^2}\frac{\partial m}{\partial p_i}  \]
+
+Now the second derivatives are given by:
+
+\[ \frac{\partial^2 \tilde{\chi}^2}{\partial p_j \partial p_i} = \sum_n \frac{\partial^2 f^2}{\partial p_j \partial p_i} \]
+
+\[ \frac{\partial^2 f^2}{\partial p_j \partial p_i} = \frac{\partial}{\partial p_j} \left[ - \frac{2 \chi_n}{\sigma_n}\frac{Q^2}{(\chi_n^2 + Q)^2} \right] \frac{\partial m}{\partial p_i}  - \frac{2 \chi_n}{\sigma_n}\frac{Q^2}{(\chi_n^2 + Q)^2} \frac{\partial^2 m}{\partial p_j \partial p_i} \]
+
+With a little manipulation this becomes
+
+\[ \frac{\partial^2 f^2}{\partial p_j \partial p_i} = \frac{2Q^2}{\sigma_n^2} \frac{Q^2 - 3 \chi_n^2}{(\chi_n^2 + Q)^3} \frac{\partial m}{\partial p_j} \frac{\partial m}{\partial p_i} - \frac{2 \chi_n}{\sigma_n}\frac{Q^2}{(\chi_n^2 + Q)^2} \frac{\partial^2 m}{\partial p_j \partial p_i} \]
+
+Messy, but still analytic!
+</p>
+</div>
+{% endblock %}

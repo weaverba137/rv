@@ -1,0 +1,30 @@
+body {
+    padding-top: 70px;
+}
+
+div.flot-plot {
+    width: 500px;
+    height: 500px;
+    padding: 0;
+    margin: 0;
+}
+
+.rotate {
+    /* Safari */
+    /* -webkit-transform: rotate(-90deg); */
+    /*-webkit-writing-mode: vertical-lr;*/
+    /* Firefox */
+    /* -moz-transform: rotate(-90deg); */
+    /*-mox-writing-mode: vertical-lr;*/
+    /* IE */
+    /* -ms-transform: rotate(-90deg); */
+    /*-ms-writing-mode: vertical-lr;*/
+    /* Opera */
+    /* -o-transform: rotate(-90deg); */
+    /*-o-writing-mode: vertical-lr;*/
+    /* Generic */
+    transform: rotate(-90deg);
+    /*writing-mode: vertical-lr;*/
+    /*text-orientation: sideways-left;*/
+    /*direction: ltr;*/
+}

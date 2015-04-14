@@ -1,0 +1,29 @@
+{% extends "master.html" %}
+{% block content %}
+<div class="col-md-2">
+{% if locids %}
+<h2>Location IDs</h2>
+<ul>
+{% for l in locids %}
+<li><a href="{{url_for('list_stars',locid=l)}}">{{l}}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+<h2>No Location IDs.</h2>
+{% endif %}
+</div>
+<div class="col-md-2">
+{% if stars %}
+<h2>Stars</h2>
+<ul>
+{% for s in stars %}
+<li><a href="{{url_for('star',locid=locid,tmass_id=s)}}">{{s}}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+<h2>No Stars.</h2>
+{% endif %}
+</div>
+<div class="col-md-8">
+</div>
+{% endblock %}

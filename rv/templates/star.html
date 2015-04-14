@@ -1,0 +1,68 @@
+{% extends "master.html" %}
+{% block content %}
+<div class="col-md-2">
+{% if locids %}
+<h2>Location IDs</h2>
+<ul>
+{% for l in locids %}
+<li><a href="{{url_for('list_stars',locid=l)}}">{{l}}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+<h2>No Location IDs.</h2>
+{% endif %}
+</div>
+<div class="col-md-2">
+{% if stars %}
+<h2>Stars</h2>
+<ul>
+{% for s in stars %}
+<li><a href="{{url_for('star',locid=locid,tmass_id=s)}}">{{s}}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+<h2>No Stars.</h2>
+{% endif %}
+</div>
+<div class="col-md-8">
+{% if tmass_id %}
+<h2>{{tmass_id}}</h2>
+<p><a href="{{sas}}">SAS</a>&nbsp;<a href="{{cas}}">CAS</a>&nbsp;<a href="http://sdss.physics.nyu.edu/apogee-rv/{{apstar_id}}.png">Image</a></p>
+<dl class="dl-horizontal">
+    <dt><var>T</var><sub>eff</sub></dt>
+    <dd>{{teff}}&nbsp;K</dd>
+    <dt>log<sub>10</sub>&nbsp;<var>g</var><dt>
+    <dd>{{logg}}</dd>
+    <dt>[M/H]</dt>
+    <dd>{{mh}}</dd>
+</dl>
+<form class="form-inline">
+    <div class="form-group">
+        <label for="Q">Q</label>
+        <select id="Q" class="form-control">
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>10</option>
+            <option>20</option>
+            <option>30</option>
+            <option>50</option>
+        </select>
+    </div>
+    <button class="btn btn-default" id="unzoom">Reset Zoom</button>
+    <div class="form-group">
+        <p class="form-control-static" id="calc"></p>
+    </div>
+</form>
+{# <p><span class="rotate">Rotated Text</span></p> #}
+<div id="plot_area" class="flot-plot"></div>
+<div id="SNR_area" class="flot-plot"></div>
+{# <p class="text-center">MJD&nbsp;&ndash;&nbsp;{{mjd_zero}}</p> #}
+{% else %}
+<h2>No Star.</h2>
+{% endif %}
+</div>
+{% endblock %}
