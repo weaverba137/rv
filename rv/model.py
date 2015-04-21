@@ -48,6 +48,8 @@ def chin(p,x,t,s):
 #
 #
 def f2(p,x,t,s,Q=0):
+    """Function of 'chi' that will be summed to produce the final objective function.
+    """
     chi = chin(p,x,t,s)
     if Q == 0:
         return chi**2
@@ -57,6 +59,8 @@ def f2(p,x,t,s,Q=0):
 #
 #
 def df2dp(p,x,t,s,Q=0):
+    """Gradient of f2 with respect to the parameters.
+    """
     chi = chin(p,x,t,s)
     d = dmdp(p,t)
     if Q == 0:
@@ -68,6 +72,8 @@ def df2dp(p,x,t,s,Q=0):
 #
 #
 def d2f2dpdp(p,x,t,s,Q=0):
+    """Second derivative of f2 with respect to the parameters.
+    """
     H = np.zeros((p.size,p.size,t.size),dtype=p.dtype)
     chi = chin(p,x,t,s)
     d = dmdp(p,t)
@@ -86,14 +92,20 @@ def d2f2dpdp(p,x,t,s,Q=0):
 #
 #
 def obj(p,x,t,s,Q=0):
+    """The objective function, that is the function to be minimized.
+    """
     return f2(p,x,t,s,Q).sum()
 #
 #
 #
 def dobj(p,x,t,s,Q=0):
+    """Gradient of the objective function with respect to the parameters.
+    """
     return df2dp(p,x,t,s,Q).sum(1)
 #
 #
 #
 def d2obj(p,x,t,s,Q=0):
+    """Second derivative of the objective function with respect to the parameters.
+    """
     return d2f2dpdp(p,x,t,s,Q).sum(2)
