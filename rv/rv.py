@@ -15,6 +15,7 @@ from flask import Flask, render_template, jsonify, request, json
 from werkzeug.contrib.cache import SimpleCache
 from .model import model, obj, dobj, d2obj
 from .fitter import fitter
+from .util import rv_options, rv_data
 #
 #
 #
@@ -23,14 +24,11 @@ cache = SimpleCache()
 #
 #
 #
-plotDir = join(getenv('HOME'),'Desktop','apogee-rv')
-mjd_zero = 55800
+options = rv_options(description='RV',set_args=[])
 #
 # Files
 #
-f = join(plotDir,'apogee_vrel.pickle')
-with open(f) as p:
-    stars = pickle.load(p)
+stars = rv_data(options)
 locids = sorted(list(set([int(s.split('.')[4]) for s in stars])))
 tmass_ids = dict()
 for s in stars:
@@ -70,22 +68,26 @@ def list_stars(locid):
 #
 @app.route("/<int:locid>/<tmass_id>")
 def star(locid,tmass_id):
+    """Return data on an individual star.
+    """
     apstar_id = 'apogee.apo25m.s.stars.{0:d}.{1}'.format(locid,tmass_id)
     data = stars[apstar_id]
     return render_template('star.html', title="{0:d}.{1}".format(locid,tmass_id),
         locids=locids, teff=data['teff'], logg=data['logg'], mh=data['mh'],
         sas=data['sas'], cas=data['cas'], apstar_id=apstar_id,
         locid=locid, stars=sorted(tmass_ids[locid]), tmass_id=tmass_id,
-        mjd_zero=mjd_zero)
+        mjd_zero=options.mjd_zero)
 #
 #
 #
 @app.route("/<int:locid>/<tmass_id>/<int:Q>")
 def data(locid,tmass_id,Q):
+    """Return fitted model parameters.
+    """
     apstar_id = 'apogee.apo25m.s.stars.{0:d}.{1}'.format(locid,tmass_id)
-    data = stars[apstar_id]
     response = cache.get(apstar_id+'.'+str(Q))
     if response is None:
+        data = stars[apstar_id]
         fits = fitter(data,Q)
         good_fits = [f for f in fits if f.success]
         chi = np.array([f.fun for f in fits if f.success])
@@ -96,7 +98,7 @@ def data(locid,tmass_id,Q):
         day_data = days.tolist()
         json_data = {"Q":Q,
             'apstar_id':apstar_id,
-            'mjd_zero':mjd_zero,
+            'mjd_zero':options.mjd_zero,
             'fit1':[ [day_data[d], fit1[d]] for d in range(len(day_data))],
             'fit2':[ [day_data[d], fit2[d]] for d in range(len(day_data))]
             }
