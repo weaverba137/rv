@@ -14,6 +14,7 @@ import cPickle as pickle
 from flask import Flask, render_template, jsonify, request, json
 from werkzeug.contrib.cache import SimpleCache
 from .model import model, obj, dobj, d2obj
+from .fitter import fitter
 #
 #
 #
@@ -85,14 +86,7 @@ def data(locid,tmass_id,Q):
     data = stars[apstar_id]
     response = cache.get(apstar_id+'.'+str(Q))
     if response is None:
-        N = 200
-        Ts = np.logspace(2,5,N)
-        w0 = 2.0*np.pi/Ts
-        fits = list()
-        for k in range(N):
-            p0 = np.array([data['vhelio_avg'],data['vscatter'],0,w0[k]])
-            fit =  minimize(obj,p0,args=(data['vhelio'],data['mjd'],data['vrelerr'],Q),method='Newton-CG',jac=dobj,hess=d2obj,options={'disp':False})
-            fits.append(fit)
+        fits = fitter(data,Q)
         good_fits = [f for f in fits if f.success]
         chi = np.array([f.fun for f in fits if f.success])
         k = np.argsort(chi)
