@@ -88,7 +88,8 @@ def data(locid,tmass_id,Q):
     response = cache.get(apstar_id+'.'+str(Q))
     if response is None:
         data = stars[apstar_id]
-        fits = fitter(data,Q)
+        options.Q = Q
+        fits = fitter(data,options)
         good_fits = [f for f in fits if f.success]
         chi = np.array([f.fun for f in fits if f.success])
         k = np.argsort(chi)

@@ -10,19 +10,25 @@ import numpy as np
 #
 #
 #
-def fitter(data,Q):
+def initial_period(N=100,logTmin=2,logTmax=5):
+    """Return a vector of initial frequencies.
+    """
+    Ts = np.logspace(logTmin,logTmax,N)
+    return 2.0*np.pi/Ts
+#
+#
+#
+def fitter(data,options):
     """Runs scipy.minimize on a set of initial guesses.
     """
     from scipy.optimize import minimize
     from .model import obj, dobj, d2obj
-    N = 100
-    Ts = np.logspace(2,5,N)
-    w0 = 2.0*np.pi/Ts
+    w0 = initial_period()
     fits = list()
     for k in range(N):
         p0 = np.array([data['vhelio_avg'],data['vscatter'],0,w0[k]])
         fit =  minimize(obj,p0,
-                        args=(data['vhelio'],data['mjd'],data['vrelerr'],Q),
+                        args=(data['vhelio'],data['mjd'],data['vrelerr'],options.Q),
                         method='TNC',
                         jac=dobj,
                         # hess=d2obj,
