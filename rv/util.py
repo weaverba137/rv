@@ -15,7 +15,7 @@ def rv_options(description="RV",set_args=None):
     from os import getenv
     from os.path import join
     from argparse import ArgumentParser
-    parser = ArgumentParser(description=description,prog='rv')
+    parser = ArgumentParser(description=description,prog='rvMain')
     parser.add_argument('-c', '--clobber', action='store_true', dest='clobber',
         help='Overwrite any cache file(s).')
     parser.add_argument('-d', '--diagnostics', action='store_true', dest='diag',
