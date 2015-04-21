@@ -25,7 +25,7 @@ def fitter(data,options):
     from .model import obj, dobj, d2obj
     w0 = initial_period()
     fits = list()
-    for k in range(N):
+    for k in range(len(w0)):
         p0 = np.array([data['vhelio_avg'],data['vscatter'],0,w0[k]])
         fit =  minimize(obj,p0,
                         args=(data['vhelio'],data['mjd'],data['vrelerr'],options.Q),

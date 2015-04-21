@@ -53,6 +53,7 @@ def diagnostic_plots(stars,options):
 def rv_plot(data,fits,options):
     """Plot RV curve.
     """
+    from os.path import join
     from numpy import array, argsort, linspace
     from .model import model
     apstar_id = 'apogee.apo25m.s.stars.{0:d}.{1}'.format(data['locid'],data['tmassid'])
