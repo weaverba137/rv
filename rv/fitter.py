@@ -23,16 +23,19 @@ def fitter(data,options):
     """
     from scipy.optimize import minimize
     from .model import obj, dobj, d2obj
+    fit_options = {'disp':False}
+    if options.method == 'TNC':
+        fit_options['maxiter'] = 10000
     w0 = initial_period()
     fits = list()
     for k in range(len(w0)):
         p0 = np.array([data['vhelio_avg'],data['vscatter'],0,w0[k]])
         fit =  minimize(obj,p0,
                         args=(data['vhelio'],data['mjd'],data['vrelerr'],options.Q),
-                        method='TNC',
+                        method=options.method,
                         jac=dobj,
                         # hess=d2obj,
                         bounds=((None,None),(None,None),(None,None),(2.0*np.pi*1.0e-6,2.0*np.pi)),
-                        options={'disp':False,'maxiter':10000})
+                        options=fit_options)
         fits.append(fit)
     return fits

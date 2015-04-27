@@ -32,6 +32,7 @@ def main():
     #
     if options.plot:
         for s in stars:
+            print(s)
             fits = fitter(stars[s],options)
             rv_plot(stars[s],fits,options)
     #

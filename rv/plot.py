@@ -23,6 +23,7 @@ def diagnostic_plots(stars,options):
     """Produce diagnostic plots.
     """
     from numpy import array
+    from os.path import join
     max_mjd = array([stars[s]['mjd'][-1] for s in stars])
     min_mjd = array([stars[s]['mjd'][0]  for s in stars])
     delta_mjd = max_mjd - min_mjd
@@ -38,7 +39,7 @@ def diagnostic_plots(stars,options):
     nvisit = list()
     for s in stars:
         nvisit.append(len(stars[s]['mjd']))
-    nvisit = np.array(nvisit)
+    nvisit = array(nvisit)
     ax = inthist(nvisit,True)
     foo = ax.set_xlabel('Number of Visits')
     foo = ax.set_ylabel('N')

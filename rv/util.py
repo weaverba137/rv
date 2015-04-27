@@ -25,6 +25,9 @@ def rv_options(description="RV",set_args=None):
         help='Read data from DIR.')
     parser.add_argument('-I', '--no-index', action='store_false', dest='index',
         help='Do not regenerate index file.')
+    parser.add_argument('-m', '--method', action='store', dest='method',
+        default='TNC', metavar='METHOD',
+        help='Set the optimization method for scipy.optimize.minimize (default "TNC").')
     parser.add_argument('-p', '--plot', action='store_true', dest='plot',
         help='Produce plots.')
     parser.add_argument('-Q', '--q-value', action='store', type=float, dest='Q',
