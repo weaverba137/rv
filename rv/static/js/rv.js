@@ -51,6 +51,16 @@ function replot() {
     var plot = $.plot(plot_area, rv, plot_options);
     var plot2 = $.plot(SNR_area, snr, SNR_options);
     $("#calc").html("");
+    var T1 = 2.0*Math.PI/fit1_param[3];
+    var T2 = 2.0*Math.PI/fit2_param[3];
+    $("#fit1v").html(fit1_param[0].toFixed(2));
+    $("#fit1A").html(fit1_param[1].toFixed(2));
+    $("#fit1B").html(fit1_param[2].toFixed(2));
+    $("#fit1T").html(T1.toFixed(2));
+    $("#fit2v").html("("+fit2_param[0].toFixed(2)+")");
+    $("#fit2A").html("("+fit2_param[1].toFixed(2)+")");
+    $("#fit2B").html("("+fit2_param[2].toFixed(2)+")");
+    $("#fit2T").html("("+T2.toFixed(2)+")");
 }
 //
 //
@@ -136,6 +146,8 @@ function onDataReceived(data) {
     ylim.panRange[0] = ylim.min - 1.0;
     ylim.panRange[1] = ylim.max + 1.0;
     mjd_zero = data.mjd_zero;
+    fit1_param = data.fit1_param;
+    fit2_param = data.fit2_param;
 }
 //
 //
@@ -159,6 +171,8 @@ var xlim = null;
 var ylim = null;
 var mjd_zero = 0;
 var Q = 0;
+var fit1_param = [];
+var fit2_param = [];
 if (rv.length == 0) {
     load_data();
 }

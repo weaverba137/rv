@@ -24,7 +24,7 @@ cache = SimpleCache()
 #
 #
 #
-options = rv_options(description='RV',set_args=[])
+options = rv_options(description='RV',set_args=['--method', 'L-BFGS-B'])
 #
 # Files
 #
@@ -101,7 +101,9 @@ def data(locid,tmass_id,Q):
             'apstar_id':apstar_id,
             'mjd_zero':options.mjd_zero,
             'fit1':[ [day_data[d], fit1[d]] for d in range(len(day_data))],
-            'fit2':[ [day_data[d], fit2[d]] for d in range(len(day_data))]
+            'fit2':[ [day_data[d], fit2[d]] for d in range(len(day_data))],
+            'fit1_param': good_fits[k[0]].x.tolist(),
+            'fit2_param': good_fits[k[1]].x.tolist()
             }
         for k in data:
             if k in ('mjd','vhelio','vrelerr','snr'):

@@ -38,7 +38,7 @@ def rv_options(description="RV",set_args=None):
     if set_args is None:
         options = parser.parse_args()
     else:
-        set_args = parser.parse_args(set_args)
+        options = parser.parse_args(set_args)
     return options
 #
 #
