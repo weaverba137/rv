@@ -22,7 +22,7 @@ titlefont = FontProperties(size='x-large')
 def diagnostic_plots(stars,options):
     """Produce diagnostic plots.
     """
-    from numpy import array
+    from numpy import array, hypot, arctan2, pi
     from os.path import join
     max_mjd = array([stars[s]['mjd'][-1] for s in stars])
     min_mjd = array([stars[s]['mjd'][0]  for s in stars])
@@ -37,8 +37,20 @@ def diagnostic_plots(stars,options):
     plt.close(fig)
     # print(min_mjd.min(),max_mjd.max())
     nvisit = list()
+    kappa1 = list()
+    P1 = list()
+    kappa2 = list()
+    P2 = list()
     for s in stars:
         nvisit.append(len(stars[s]['mjd']))
+        if 'fit1' in stars[s]:
+            kappa1.append(hypot(stars[s]['fit1'][1], stars[s]['fit1'][2]))
+            # phi1.append(arctan2(stars[s]['fit1'][2], stars[s]['fit1'][1]))
+            P1.append(2.0*pi/stars[s]['fit1'][3])
+        if 'fit2' in stars[s]:
+            kappa2.append(hypot(stars[s]['fit2'][1], stars[s]['fit2'][2]))
+            # phi2.append(arctan2(stars[s]['fit2'][2], stars[s]['fit2'][1]))
+            P2.append(2.0*pi/stars[s]['fit2'][3])
     nvisit = array(nvisit)
     ax = inthist(nvisit,True)
     foo = ax.set_xlabel('Number of Visits')
@@ -47,6 +59,17 @@ def diagnostic_plots(stars,options):
     fig.savefig(join(options.plotDir,'nvisit.png'))
     fig.clf()
     plt.close(fig)
+    if len(kappa1) > 0:
+        kappa1 = array(kappa1)
+        P1 = array(P1)
+        fig = plt.figure(dpi=100)
+        ax = fig.add_subplot(111)
+        p1 = ax.loglog(P1,kappa1,'k.')
+        foo = ax.set_xlabel('Orbital Period [days]', fontproperties=titlefont)
+        foo = ax.set_ylabel('Velocity Amplitude [km/s]', fontproperties=titlefont)
+        fig.savefig(join(options.plotDir,'kappa-P.png'))
+        fig.clf()
+        plt.close(fig)
     return
 #
 #
@@ -89,7 +112,7 @@ def rv_plot(data,fits,options):
     fig.savefig(join(options.plotDir,apstar_id+'.png'))
     fig.clf()
     plt.close(fig)
-    return
+    return (good_fits[k[0]].x,good_fits[k[1]].x)
 #
 #
 #

@@ -34,7 +34,9 @@ def main():
         for s in stars:
             print(s)
             fits = fitter(stars[s],options)
-            rv_plot(stars[s],fits,options)
+            fit1, fit2 = rv_plot(stars[s],fits,options)
+            stars[s]['fit1'] = fit1
+            stars[s]['fit2'] = fit2
     #
     # Create index.html
     #

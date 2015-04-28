@@ -26,8 +26,8 @@ def rv_options(description="RV",set_args=None):
     parser.add_argument('-I', '--no-index', action='store_false', dest='index',
         help='Do not regenerate index file.')
     parser.add_argument('-m', '--method', action='store', dest='method',
-        default='TNC', metavar='METHOD',
-        help='Set the optimization method for scipy.optimize.minimize (default "TNC").')
+        default='L-BFGS-B', metavar='METHOD',
+        help='Set the optimization method for scipy.optimize.minimize (default "L-BFGS-B").')
     parser.add_argument('-p', '--plot', action='store_true', dest='plot',
         help='Produce plots.')
     parser.add_argument('-Q', '--q-value', action='store', type=float, dest='Q',
@@ -151,10 +151,12 @@ ORDER BY aspcap.apstar_id, visit.jd;
             <tr>
                 <td><a href="time.png"><img src="time.png" alt="Time Baseline" /></a></td>
                 <td><a href="nvisit.png"><img src="nvisit.png" alt="Number of Visits" /></a></td>
+                <td><a href="kappa-P.png"><img src="kappa-P.png" alt="Amplitude versus Period" /></a></td>
             </tr>
             <tr>
                 <td>Histogram of RV time baselines.</td>
                 <td>Histogram of number of visits.</td>
+                <td>Plot of velocity amplitude <em>versus</em> orbital period.</td>
             </tr>
         </table>
 {0}

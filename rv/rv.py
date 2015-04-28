@@ -24,7 +24,7 @@ cache = SimpleCache()
 #
 #
 #
-options = rv_options(description='RV',set_args=['--method', 'L-BFGS-B'])
+options = rv_options(description='RV',set_args=[])
 #
 # Files
 #

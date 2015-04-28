@@ -51,15 +51,19 @@ function replot() {
     var plot = $.plot(plot_area, rv, plot_options);
     var plot2 = $.plot(SNR_area, snr, SNR_options);
     $("#calc").html("");
+    var a1 = Math.sqrt(fit1_param[1]*fit1_param[1] + fit1_param[2]*fit1_param[2]);
+    var a2 = Math.sqrt(fit2_param[1]*fit2_param[1] + fit2_param[2]*fit2_param[2]);
+    var phi1 = 180.0*Math.atan2(fit1_param[2],fit1_param[1])/Math.PI;
+    var phi2 = 180.0*Math.atan2(fit2_param[2],fit2_param[1])/Math.PI;
     var T1 = 2.0*Math.PI/fit1_param[3];
     var T2 = 2.0*Math.PI/fit2_param[3];
     $("#fit1v").html(fit1_param[0].toFixed(2));
-    $("#fit1A").html(fit1_param[1].toFixed(2));
-    $("#fit1B").html(fit1_param[2].toFixed(2));
+    $("#fit1A").html(a1.toFixed(2));
+    $("#fit1B").html(phi1.toFixed(2));
     $("#fit1T").html(T1.toFixed(2));
     $("#fit2v").html("("+fit2_param[0].toFixed(2)+")");
-    $("#fit2A").html("("+fit2_param[1].toFixed(2)+")");
-    $("#fit2B").html("("+fit2_param[2].toFixed(2)+")");
+    $("#fit2A").html("("+a2.toFixed(2)+")");
+    $("#fit2B").html("("+phi2.toFixed(2)+")");
     $("#fit2T").html("("+T2.toFixed(2)+")");
 }
 //
