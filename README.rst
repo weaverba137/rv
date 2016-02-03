@@ -14,6 +14,13 @@ Travis Build Status
     :target: https://travis-ci.org/weaverba137/rv
     :alt: Travis Build Status
 
+Test Coverage Status
+--------------------
+
+.. image:: https://coveralls.io/repos/weaverba137/rv/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/weaverba137/rv?branch=master
+    :alt: Test Coverage Status
+
 License
 -------
 

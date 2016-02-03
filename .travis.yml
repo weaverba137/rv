@@ -4,7 +4,8 @@ python:
     - 2.7
     - 3.3
     - 3.4
-    - 3.5
+    # Scipy doesn't like 3.5.
+    # - 3.5
 
 # Setting sudo to false opts in to Travis-CI container-based builds.
 sudo: false
@@ -57,8 +58,8 @@ matrix:
         # Try Astropy development version
         - python: 2.7
           env: ASTROPY_VERSION=development
-        - python: 3.5
-          env: ASTROPY_VERSION=development
+        # - python: 3.5
+        #   env: ASTROPY_VERSION=development
 
         # Try older numpy versions
         - python: 2.7
