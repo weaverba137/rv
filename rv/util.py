@@ -15,24 +15,24 @@ def rv_options(description="RV", set_args=None):
     from argparse import ArgumentParser
     parser = ArgumentParser(description=description, prog='rvMain')
     parser.add_argument('-c', '--clobber', action='store_true', dest='clobber',
-        help='Overwrite any cache file(s).')
-    parser.add_argument('-d', '--diagnostics', action='store_true', dest='diag',
-        help='Produce diagnostic plots.')
+                        help='Overwrite any cache file(s).')
+    parser.add_argument('-d', '--diagnostics', action='store_true',
+                        dest='diag', help='Produce diagnostic plots.')
     parser.add_argument('-D', '--data-dir', action='store', dest='plotDir',
-        default=join(getenv('HOME'),'Desktop','apogee-rv'), metavar='DIR',
-        help='Read data from DIR.')
+                        default=join(getenv('HOME'), 'Desktop', 'apogee-rv'),
+                        metavar='DIR', help='Read data from DIR.')
     parser.add_argument('-I', '--no-index', action='store_false', dest='index',
-        help='Do not regenerate index file.')
+                        help='Do not regenerate index file.')
     parser.add_argument('-m', '--method', action='store', dest='method',
-        default='L-BFGS-B', metavar='METHOD',
-        help='Set the optimization method for scipy.optimize.minimize (default "L-BFGS-B").')
+                        default='L-BFGS-B', metavar='METHOD',
+                        help='Set the optimization method for scipy.optimize.minimize (default "L-BFGS-B").')
     parser.add_argument('-p', '--plot', action='store_true', dest='plot',
-        help='Produce plots.')
-    parser.add_argument('-Q', '--q-value', action='store', type=float, dest='Q',
-        default=0, metavar='Q', help='Set Q value.')
-    parser.add_argument('-z', '--zero', action='store', type=int, dest='mjd_zero',
-        metavar='MJD', default=55800,
-        help='Set zero day to this MJD.')
+                        help='Produce plots.')
+    parser.add_argument('-Q', '--q-value', action='store', type=float,
+                        dest='Q', default=0, metavar='Q', help='Set Q value.')
+    parser.add_argument('-z', '--zero', action='store', type=int,
+                        dest='mjd_zero', metavar='MJD', default=55800,
+                        help='Set zero day to this MJD.')
     if set_args is None:
         options = parser.parse_args()
     else:
@@ -66,18 +66,23 @@ def rv_data(options):
         # Sort the data
         #
         stars = OrderedDict()
+        sas_base_url = 'http://mirror.sdss3.org/irSpectrumDetail'
+        cas_base_url = "http://skyserver.sdss.org/dr12/en/tools/explore/Summary.aspx?apid="
         for row in data:
             if row['apstar_id'] not in stars:
                 foo = row['apstar_id'].split('.')
                 locid = int(foo[4])
                 c = int(foo[2] == 'c')
-                sas_url = "http://mirror.sdss3.org/irSpectrumDetail?locid={0:d}&commiss={1:d}&apogeeid={2}".format(locid, c, foo[5])
-                cas_url = "http://skyserver.sdss.org/dr12/en/tools/explore/Summary.aspx?apid="+row['apstar_id']
-                stars[row['apstar_id']] = {'mjd': [], 'vhelio': [], 'vrelerr': [],
-                                           'teff': row['teff'], 'logg': row['logg'], 'mh': row['param_m_h'],
-                                           'snr': [],
-                                           'vhelio_avg': row['vhelio_avg'], 'vscatter': row['vscatter'],
-                                           'commiss': c, 'locid': int(foo[4]), 'tmassid': foo[5],
+                sas_url = "{0}?locid={1:d}&commiss={2:d}&apogeeid={3}".format(sas_base_url, locid, c, foo[5])
+                cas_url = cas_base_url + row['apstar_id']
+                stars[row['apstar_id']] = {'mjd': [], 'vhelio': [],
+                                           'vrelerr': [], 'teff': row['teff'],
+                                           'logg': row['logg'],
+                                           'mh': row['param_m_h'], 'snr': [],
+                                           'vhelio_avg': row['vhelio_avg'],
+                                           'vscatter': row['vscatter'],
+                                           'commiss': c, 'locid': int(foo[4]),
+                                           'tmassid': foo[5],
                                            'sas': sas_url, 'cas': cas_url}
             stars[row['apstar_id']]['mjd'].append(row['jd'] - 2400000.5 - options.mjd_zero)
             stars[row['apstar_id']]['vhelio'].append(row['vhelio'])
