@@ -9,6 +9,18 @@ from __future__ import (absolute_import, division, print_function,
 
 def rv_options(description="RV", set_args=None):
     """Set the options typically used by rv.
+
+    Parameters
+    ----------
+    description : :class:`str`, optional
+        The overall description of the command-line program.
+    set_args : :class:`list`, optional
+        A list that will be passed to :meth:`argparse.ArgumentParser.parse_args`.
+
+    Returns
+    -------
+    :class:`~argparse.Namespace`
+        Parsed command-line options.
     """
     from os import getenv
     from os.path import join
@@ -42,6 +54,16 @@ def rv_options(description="RV", set_args=None):
 
 def rv_data(options):
     """Load RV data.
+
+    Parameters
+    ----------
+    options : :class:`~argparse.Namespace`
+        Command-line options.
+
+    Returns
+    -------
+    :class:`~collections.OrderedDict`
+        The data loaded from disk.
     """
     from os import getenv
     from os.path import exists, join
@@ -104,14 +126,14 @@ def create_index(stars, ncol=6):
 
     Parameters
     ----------
-    stars : dict
+    stars : :class:`dict`
         Dictionary containing data grouped by star.
-    ncol : int, optional
+    ncol : :class:`int`, optional
         Number of columns in the output.
 
     Returns
     -------
-    create_index : str
+    :class:`str`
         The index.html file as a string.
     """
     index_text = """<!DOCTYPE html>

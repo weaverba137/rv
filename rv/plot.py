@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 # -*- coding: utf-8 -*-
-"""Functions for loading data, setting options, etc.
+"""Functions for loading plotting the data.
 """
 #
 from __future__ import (absolute_import, division, print_function,
@@ -19,6 +19,13 @@ titlefont = FontProperties(size='x-large')
 
 def diagnostic_plots(stars, options):
     """Produce diagnostic plots.
+
+    Parameters
+    ----------
+    stars : :class:`dict`
+        A dictionary containing data.
+    options : :class:`~argparse.Namespace`
+        Command-line options.
     """
     from numpy import array, hypot, arctan2, pi
     from os.path import join
@@ -74,6 +81,20 @@ def diagnostic_plots(stars, options):
 
 def rv_plot(data, fits, options):
     """Plot RV curve.
+
+    Parameters
+    ----------
+    data : :class:`dict`
+        The data on an individual star.
+    fits : :class:`list`
+        The fitted curves produced by :func:`~rv.fitter.fitter`.
+    options : :class:`~argparse.Namespace`
+        Command-line options.
+
+    Returns
+    -------
+    :func:`tuple`
+        The best and second-best fitted values.
     """
     from os.path import join
     from numpy import array, argsort, linspace
@@ -126,15 +147,17 @@ def inthist(foo, show=False):
 
     Parameters
     ----------
-    foo : numpy.ndarray
+    foo : :class:`~numpy.ndarray`
         An array containing integers.
-    show : bool, optional
-        If ``True``, create a histogram and return the matplotlib.axes.Axes
-        instance.
+    show : :class:`bool`, optional
+        If ``True``, create a histogram and return the
+        :class:`matplotlib.axes.Axes` instance.
 
     Returns
     -------
-    inthist : mixed
+    :func:`tuple` or :class:`matplotlib.axes.Axes`
+        If `show` is ``False``, just return the number in each bin and the
+        bins, respectively.
     """
     import numpy as np
     xmin = min(foo)

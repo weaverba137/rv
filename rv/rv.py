@@ -5,11 +5,7 @@
 #
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-from os import getenv
-from os.path import join
 import numpy as np
-from scipy.optimize import minimize
-import cPickle as pickle
 from flask import Flask, render_template, jsonify, request, json
 from werkzeug.contrib.cache import SimpleCache
 from .model import model, obj, dobj, d2obj
@@ -18,7 +14,11 @@ from .util import rv_options, rv_data
 
 
 app = Flask(__name__)
-
+cache = None
+options = None
+stars = None
+locids = None
+tmass_ids = None
 
 @app.route("/")
 def index():
@@ -105,6 +105,7 @@ def data(locid, tmass_id, Q):
 def main():
     """Run the Flask app.
     """
+    global cache, options, stars, locids, tmass_ids
     cache = SimpleCache()
     options = rv_options(description='RV', set_args=[])
     stars = rv_data(options)

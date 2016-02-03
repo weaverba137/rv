@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division, print_function,
 
 
 def main():
-    """Main program.
+    """Entry point for the command-line script, :command:`rv`.
     """
     #
     # Imports

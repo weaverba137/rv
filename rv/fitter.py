@@ -9,20 +9,20 @@ import numpy as np
 
 
 def initial_period(N=100, logTmin=2, logTmax=5):
-    """Return a vector of initial frequencies.
+    """Return a vector of initial frequencies, evenly spaced in log *period*.
 
     Parameters
     ----------
-    N : int, optional
+    N : :class:`int`, optional
         Number of frequencies, default 100.
-    logTmin : float, optional
+    logTmin : :class:`float`, optional
         Minumum log period, default 2 (100 days).
-    logTmax : float, optional
+    logTmax : :class:`float`, optional
         Maximum log period, default 5 (100,000 days).
 
     Returns
     -------
-    ndarray
+    :class:`~numpy.ndarray`
         Array containing orbital angular frequencies.
     """
     Ts = np.logspace(logTmin, logTmax, N)
@@ -30,7 +30,19 @@ def initial_period(N=100, logTmin=2, logTmax=5):
 
 
 def fitter(data, options):
-    """Runs scipy.minimize on a set of initial guesses.
+    """Runs :func:`~scipy.optimize.minimize` on a set of initial guesses.
+
+    Parameters
+    ----------
+    data : :class:`dict`
+        A dictionary containing the radial velocity data.
+    options : :class:`~argparse.Namespace`
+        Command-line options.
+
+    Returns
+    -------
+    :class:`list`
+        A set of fits, one for each initial period guess.
     """
     from scipy.optimize import minimize
     from .model import obj, dobj, d2obj
