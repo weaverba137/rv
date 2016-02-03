@@ -7,6 +7,13 @@ Introduction
 
 Toy WebApp for investigating radial velocities.
 
+Travis Build Status
+-------------------
+
+.. image:: https://img.shields.io/travis/weaverba137/rv.svg
+    :target: https://travis-ci.org/weaverba137/rv
+    :alt: Travis Build Status
+
 License
 -------
 
