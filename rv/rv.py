@@ -14,11 +14,19 @@ from .util import rv_options, rv_data
 
 
 app = Flask(__name__)
-cache = None
-options = None
-stars = None
-locids = None
-tmass_ids = None
+cache = SimpleCache()
+options = rv_options(description='RV', set_args=[])
+stars = rv_data(options)
+locids = sorted(list(set([int(s.split('.')[4]) for s in stars])))
+tmass_ids = dict()
+for s in stars:
+    foo = s.split('.')
+    l = int(foo[4])
+    if l in tmass_ids:
+        tmass_ids[l].append(foo[5])
+    else:
+        tmass_ids[l] = [foo[5]]
+
 
 @app.route("/")
 def index():
@@ -102,20 +110,4 @@ def data(locid, tmass_id, Q):
     return response
 
 
-def main():
-    """Run the Flask app.
-    """
-    global cache, options, stars, locids, tmass_ids
-    cache = SimpleCache()
-    options = rv_options(description='RV', set_args=[])
-    stars = rv_data(options)
-    locids = sorted(list(set([int(s.split('.')[4]) for s in stars])))
-    tmass_ids = dict()
-    for s in stars:
-        foo = s.split('.')
-        l = int(foo[4])
-        if l in tmass_ids:
-            tmass_ids[l].append(foo[5])
-        else:
-            tmass_ids[l] = [foo[5]]
-    app.run(port=56789, debug=True)
+app.run(port=56789)  #, debug=True)

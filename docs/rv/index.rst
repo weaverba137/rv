@@ -38,5 +38,8 @@ Reference/API
 .. automodapi:: rv.plot
     :no-inheritance-diagram:
 
+.. .. automodapi:: rv.rv
+..    :no-inheritance-diagram:
+
 .. automodapi:: rv.util
     :no-inheritance-diagram:
