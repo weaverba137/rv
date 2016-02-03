@@ -3,12 +3,10 @@
 """Create radial velocity plots for all stars.
 """
 #
-# Import
-#
-from __future__ import absolute_import, division, print_function, unicode_literals
-#
-#
-#
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
+
 def main():
     """Main program.
     """
@@ -33,8 +31,8 @@ def main():
     if options.plot:
         for s in stars:
             print(s)
-            fits = fitter(stars[s],options)
-            fit1, fit2 = rv_plot(stars[s],fits,options)
+            fits = fitter(stars[s], options)
+            fit1, fit2 = rv_plot(stars[s], fits, options)
             stars[s]['fit1'] = fit1
             stars[s]['fit2'] = fit2
     #
@@ -42,13 +40,13 @@ def main():
     #
     if options.index:
         indexHtml = create_index(stars)
-        with open(join(options.plotDir,'index.html'),'w') as i:
+        with open(join(options.plotDir, 'index.html'), 'w') as i:
             i.write(indexHtml)
     #
     # Other diagnostics
     #
     if options.diag:
-        diagnostic_plots(stars,options)
+        diagnostic_plots(stars, options)
     #
     #
     #

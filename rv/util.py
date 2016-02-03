@@ -3,19 +3,17 @@
 """Functions for loading data, setting options, etc.
 """
 #
-# Import
-#
-from __future__ import absolute_import, division, print_function, unicode_literals
-#
-#
-#
-def rv_options(description="RV",set_args=None):
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
+
+def rv_options(description="RV", set_args=None):
     """Set the options typically used by rv.
     """
     from os import getenv
     from os.path import join
     from argparse import ArgumentParser
-    parser = ArgumentParser(description=description,prog='rvMain')
+    parser = ArgumentParser(description=description, prog='rvMain')
     parser.add_argument('-c', '--clobber', action='store_true', dest='clobber',
         help='Overwrite any cache file(s).')
     parser.add_argument('-d', '--diagnostics', action='store_true', dest='diag',
@@ -40,9 +38,8 @@ def rv_options(description="RV",set_args=None):
     else:
         options = parser.parse_args(set_args)
     return options
-#
-#
-#
+
+
 def rv_data(options):
     """Load RV data.
     """
@@ -55,12 +52,12 @@ def rv_data(options):
     #
     #
     #
-    f = join(options.plotDir,'apogee_vrel.pickle')
+    f = join(options.plotDir, 'apogee_vrel.pickle')
     if exists(f) and not options.clobber:
         with open(f) as p:
             stars = pickle.load(p)
     else:
-        fit = join(options.plotDir,'apogee_vrel_weaver.fit')
+        fit = join(options.plotDir, 'apogee_vrel_weaver.fit')
         hdulist = pyfits.open(fit)
         data = hdulist[1].data
         hdulist.close()
@@ -74,31 +71,30 @@ def rv_data(options):
                 foo = row['apstar_id'].split('.')
                 locid = int(foo[4])
                 c = int(foo[2] == 'c')
-                sas_url="http://mirror.sdss3.org/irSpectrumDetail?locid={0:d}&commiss={1:d}&apogeeid={2}".format(locid,c,foo[5])
-                cas_url="http://skyserver.sdss.org/dr12/en/tools/explore/Summary.aspx?apid="+row['apstar_id']
-                stars[row['apstar_id']] = {'mjd':[],'vhelio':[],'vrelerr':[],
-                                           'teff':row['teff'],'logg':row['logg'],'mh':row['param_m_h'],
-                                           'snr':[],
-                                           'vhelio_avg':row['vhelio_avg'],'vscatter':row['vscatter'],
-                                           'commiss':c,'locid':int(foo[4]),'tmassid':foo[5],
-                                           'sas':sas_url,'cas':cas_url}
+                sas_url = "http://mirror.sdss3.org/irSpectrumDetail?locid={0:d}&commiss={1:d}&apogeeid={2}".format(locid, c, foo[5])
+                cas_url = "http://skyserver.sdss.org/dr12/en/tools/explore/Summary.aspx?apid="+row['apstar_id']
+                stars[row['apstar_id']] = {'mjd': [], 'vhelio': [], 'vrelerr': [],
+                                           'teff': row['teff'], 'logg': row['logg'], 'mh': row['param_m_h'],
+                                           'snr': [],
+                                           'vhelio_avg': row['vhelio_avg'], 'vscatter': row['vscatter'],
+                                           'commiss': c, 'locid': int(foo[4]), 'tmassid': foo[5],
+                                           'sas': sas_url, 'cas': cas_url}
             stars[row['apstar_id']]['mjd'].append(row['jd'] - 2400000.5 - options.mjd_zero)
             stars[row['apstar_id']]['vhelio'].append(row['vhelio'])
             stars[row['apstar_id']]['vrelerr'].append(row['vrelerr'])
             stars[row['apstar_id']]['snr'].append(row['snr'])
         for s in stars:
-            for c in ('mjd','vhelio','vrelerr','snr'):
+            for c in ('mjd', 'vhelio', 'vrelerr', 'snr'):
                 stars[s][c] = array(stars[s][c])
         #
         # Save the data
         #
-        with open(f,'w') as p:
-            pickle.dump(stars,p)
+        with open(f, 'w') as p:
+            pickle.dump(stars, p)
     return stars
-#
-#
-#
-def create_index(stars,ncol=6):
+
+
+def create_index(stars, ncol=6):
     """Create index.html file.
 
     Parameters
@@ -178,7 +174,7 @@ ORDER BY aspcap.apstar_id, visit.jd;
         rows = list()
         for k in range(len(locations[l])//ncol):
             rows.append('<tr><td><strong>{0:d}</strong></td>'.format(k+1)+''.join(locations[l][ncol*k:ncol*k+ncol])+'</tr>')
-        tables += '<h2 id="loc{0:d}">{0:d}</h2>\n<table>\n<thead>\n{1}\n</thead>\n<tbody>\n'.format(l,th)
+        tables += '<h2 id="loc{0:d}">{0:d}</h2>\n<table>\n<thead>\n{1}\n</thead>\n<tbody>\n'.format(l, th)
         tables += "\n".join(rows)
         tables += '</tbody>\n</table>\n'
     return index_text.format(tables)
