@@ -1,7 +1,21 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 # -*- coding: utf-8 -*-
-"""Radial velocity webapp using Flask.
 """
-#
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+==
+rv
+==
+
+Radial velocity webapp using Flask.
+
+This is an Astropy affiliated package.
+"""
+
+# Affiliated packages may add whatever they like to this file, but
+# should keep this content at the top.
+# ----------------------------------------------------------------------------
+from ._astropy_init import *
+# ----------------------------------------------------------------------------
+
+# For egg_info test builds to pass, put package imports here.
+if not _ASTROPY_SETUP_:
+    from example_mod import *
