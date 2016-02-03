@@ -1,7 +1,0 @@
-#!/usr/bin/env python2.7
-# -*- coding: utf-8 -*-
-"""Run the Flask app.
-"""
-#
-from rv.rv import app
-app.run(port=56789,debug=True)
