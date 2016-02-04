@@ -138,25 +138,6 @@ def create_index(stars, ncol=6):
     """
     from collections import OrderedDict
     from jinja2 import Environment, PackageLoader
-    env = Environment(loader=PackageLoader('rv', 'templates'))
-    template = env.get_template('plots.html')
-    # locations = dict()
-    # for s in stars:
-    #     col = '<td><a href="apogee.apo25m.s.stars.{locid:d}.{tmassid}.png"><img src="apogee.apo25m.s.stars.{locid:d}.{tmassid}.png" alt="apogee.apo25m.s.stars.{locid:d}.{tmassid}" /></a><br /><var>T</var><sub>eff</sub> = {teff:.2f}<br />log&nbsp;<var>g</var> = {logg:.2f}<br />[M/H] = {mh:.2f}<br /><a href="{sas}">SAS</a>&nbsp;&nbsp;<a href="{cas}">CAS</a></td>'.format(**stars[s])
-    #     if stars[s]['locid'] in locations:
-    #         locations[stars[s]['locid']].append(col)
-    #     else:
-    #         locations[stars[s]['locid']] = [col]
-    # tables = ''
-    # for l in sorted(locations.keys()):
-    #     while len(locations[l]) % ncol != 0:
-    #         locations[l].append('<td></td>')
-    #     rows = list()
-    #     for k in range(len(locations[l])//ncol):
-    #         rows.append('<tr><td><strong>{0:d}</strong></td>'.format(k+1)+''.join(locations[l][ncol*k:ncol*k+ncol])+'</tr>')
-    #     tables += '<h2 id="loc{0:d}">{0:d}</h2>\n<table>\n<thead>\n{1}\n</thead>\n<tbody>\n'.format(l, th)
-    #     tables += "\n".join(rows)
-    #     tables += '</tbody>\n</table>\n'
     tables = OrderedDict()
     for s in stars:
         stuple = (stars[s]['tmassid'],
@@ -175,4 +156,7 @@ def create_index(stars, ncol=6):
     for t in tables:
         while len(tables[t]) % ncol != 0:
             tables[t].append(tuple())
-    return template.render(title='APOGEE Radial Velocities', ncol=ncol, tables=tables)
+    env = Environment(loader=PackageLoader('rv', 'templates'))
+    template = env.get_template('plots.html')
+    return template.render(title='APOGEE Radial Velocities', ncol=ncol,
+                           tables=tables)
