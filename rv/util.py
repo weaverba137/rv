@@ -136,72 +136,43 @@ def create_index(stars, ncol=6):
     :class:`str`
         The index.html file as a string.
     """
-    index_text = """<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta name="robots" content="noindex" />
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>APOGEE Radial Velocities</title>
-        <style type="text/css">
-img {{display: block; width: 200px; height: 200px;}}
-td {{text-align: center;}}
-        </style>
-    </head>
-    <body>
-        <h1>APOGEE Radial Velocities</h1>
-        <h2 id="intro">Introduction</h2>
-        <p>Data were obtained with this query:</p>
-        <pre>
-SELECT aspcap.apstar_id, aspcap.teff, aspcap.logg, aspcap.param_m_h,
-  star.vhelio_avg, star.vscatter, star.verr, star.verr_med,
-  visit.visit_id, visit.ra, visit.dec, visit.glon, visit.glat,
-  visit.snr, visit.jd, visit.vhelio, visit.vrelerr
-INTO MyDB.apogee_vrel
-FROM apogeeVisit     AS visit
-JOIN apogeeStarVisit AS starvisit ON visit.visit_id   = starvisit.visit_id
-JOIN aspcapStar      AS aspcap    ON aspcap.apstar_id = starvisit.apstar_id
-JOIN apogeeStar      AS star      ON star.apstar_id   = starvisit.apstar_id
-WHERE (aspcap.aspcapflag   &amp; dbo.fApogeeAspcapFlag('STAR_BAD')) = 0
-  AND (star.apogee_target1 &amp; dbo.fApogeeTarget1('APOGEE_LONG')) &gt; 0
-  AND aspcap.teff &gt; 0
-  AND star.nvisits &gt; 5
-ORDER BY aspcap.apstar_id, visit.jd;
-        </pre>
-        <h2 id="diag">Diagnostics</h2>
-        <table>
-            <tr>
-                <td><a href="time.png"><img src="time.png" alt="Time Baseline" /></a></td>
-                <td><a href="nvisit.png"><img src="nvisit.png" alt="Number of Visits" /></a></td>
-                <td><a href="kappa-P.png"><img src="kappa-P.png" alt="Amplitude versus Period" /></a></td>
-            </tr>
-            <tr>
-                <td>Histogram of RV time baselines.</td>
-                <td>Histogram of number of visits.</td>
-                <td>Plot of velocity amplitude <em>versus</em> orbital period.</td>
-            </tr>
-        </table>
-{0}
-    </body>
-</html>
-"""
-    th = '<tr><th></th>' + ''.join(['<th>{0:d}</th>'.format(k+1) for k in range(ncol)]) + '</tr>'
-    locations = dict()
+    from collections import OrderedDict
+    from jinja2 import Environment, PackageLoader
+    env = Environment(loader=PackageLoader('rv', 'templates'))
+    template = env.get_template('plots.html')
+    # locations = dict()
+    # for s in stars:
+    #     col = '<td><a href="apogee.apo25m.s.stars.{locid:d}.{tmassid}.png"><img src="apogee.apo25m.s.stars.{locid:d}.{tmassid}.png" alt="apogee.apo25m.s.stars.{locid:d}.{tmassid}" /></a><br /><var>T</var><sub>eff</sub> = {teff:.2f}<br />log&nbsp;<var>g</var> = {logg:.2f}<br />[M/H] = {mh:.2f}<br /><a href="{sas}">SAS</a>&nbsp;&nbsp;<a href="{cas}">CAS</a></td>'.format(**stars[s])
+    #     if stars[s]['locid'] in locations:
+    #         locations[stars[s]['locid']].append(col)
+    #     else:
+    #         locations[stars[s]['locid']] = [col]
+    # tables = ''
+    # for l in sorted(locations.keys()):
+    #     while len(locations[l]) % ncol != 0:
+    #         locations[l].append('<td></td>')
+    #     rows = list()
+    #     for k in range(len(locations[l])//ncol):
+    #         rows.append('<tr><td><strong>{0:d}</strong></td>'.format(k+1)+''.join(locations[l][ncol*k:ncol*k+ncol])+'</tr>')
+    #     tables += '<h2 id="loc{0:d}">{0:d}</h2>\n<table>\n<thead>\n{1}\n</thead>\n<tbody>\n'.format(l, th)
+    #     tables += "\n".join(rows)
+    #     tables += '</tbody>\n</table>\n'
+    tables = OrderedDict()
     for s in stars:
-        col = '<td><a href="apogee.apo25m.s.stars.{locid:d}.{tmassid}.png"><img src="apogee.apo25m.s.stars.{locid:d}.{tmassid}.png" alt="apogee.apo25m.s.stars.{locid:d}.{tmassid}" /></a><br /><var>T</var><sub>eff</sub> = {teff:.2f}<br />log&nbsp;<var>g</var> = {logg:.2f}<br />[M/H] = {mh:.2f}<br /><a href="{sas}">SAS</a>&nbsp;&nbsp;<a href="{cas}">CAS</a></td>'.format(**stars[s])
-        if stars[s]['locid'] in locations:
-            locations[stars[s]['locid']].append(col)
+        stuple = (stars[s]['tmassid'],
+                  stars[s]['teff'],
+                  stars[s]['logg'],
+                  stars[s]['mh'],
+                  stars[s]['sas'],
+                  stars[s]['cas'],)
+        if stars[s]['locid'] in tables:
+            tables[stars[s]['locid']].append(stuple)
         else:
-            locations[stars[s]['locid']] = [col]
-    tables = ''
-    for l in sorted(locations.keys()):
-        while len(locations[l]) % ncol != 0:
-            locations[l].append('<td></td>')
-        rows = list()
-        for k in range(len(locations[l])//ncol):
-            rows.append('<tr><td><strong>{0:d}</strong></td>'.format(k+1)+''.join(locations[l][ncol*k:ncol*k+ncol])+'</tr>')
-        tables += '<h2 id="loc{0:d}">{0:d}</h2>\n<table>\n<thead>\n{1}\n</thead>\n<tbody>\n'.format(l, th)
-        tables += "\n".join(rows)
-        tables += '</tbody>\n</table>\n'
-    return index_text.format(tables)
+            tables[stars[s]['locid']] = [stuple]
+    #
+    # Pad tables out to multiples of ncol
+    #
+    for t in tables:
+        while len(tables[t]) % ncol != 0:
+            tables[t].append(tuple())
+    return template.render(title='APOGEE Radial Velocities', ncol=ncol, tables=tables)

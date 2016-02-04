@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="robots" content="noindex" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{{title}}</title>
+        <style type="text/css">
+img {display: block; width: 200px; height: 200px;}
+td {text-align: center;}
+        </style>
+    </head>
+    <body>
+        <h1>{{title}}</h1>
+        <h2 id="intro">Introduction</h2>
+        <p>Data were obtained with this query:</p>
+        <pre>
+SELECT aspcap.apstar_id, aspcap.teff, aspcap.logg, aspcap.param_m_h,
+  star.vhelio_avg, star.vscatter, star.verr, star.verr_med,
+  visit.visit_id, visit.ra, visit.dec, visit.glon, visit.glat,
+  visit.snr, visit.jd, visit.vhelio, visit.vrelerr
+INTO MyDB.apogee_vrel
+FROM apogeeVisit     AS visit
+JOIN apogeeStarVisit AS starvisit ON visit.visit_id   = starvisit.visit_id
+JOIN aspcapStar      AS aspcap    ON aspcap.apstar_id = starvisit.apstar_id
+JOIN apogeeStar      AS star      ON star.apstar_id   = starvisit.apstar_id
+WHERE (aspcap.aspcapflag   &amp; dbo.fApogeeAspcapFlag('STAR_BAD')) = 0
+  AND (star.apogee_target1 &amp; dbo.fApogeeTarget1('APOGEE_LONG')) &gt; 0
+  AND aspcap.teff &gt; 0
+  AND star.nvisits &gt; 5
+ORDER BY aspcap.apstar_id, visit.jd;
+        </pre>
+        <h2 id="diag">Diagnostics</h2>
+        <table>
+            <thead></thead>
+            <tbody>
+                <tr>
+                    <td><a href="time.png"><img src="time.png" alt="Time Baseline" /></a></td>
+                    <td><a href="nvisit.png"><img src="nvisit.png" alt="Number of Visits" /></a></td>
+                    <td><a href="kappa-P.png"><img src="kappa-P.png" alt="Amplitude versus Period" /></a></td>
+                </tr>
+                <tr>
+                    <td>Histogram of RV time baselines.</td>
+                    <td>Histogram of number of visits.</td>
+                    <td>Plot of velocity amplitude <em>versus</em> orbital period.</td>
+                </tr>
+            </tbody>
+        </table>
+        {% for locid, values in tables.iteritems() %}
+        <h2 id="loc{{locid}}">{{locid}}</h2>
+        <table>
+            <thead>
+                <tr><th></th>{% for k in range(ncol) %}<th>{{ k + 1 }}</th>{% endfor %}</tr>
+            </thead>
+            <tbody>
+                {% for k in range(values|count//ncol) %}
+                <tr>
+                    <td><strong>{{ k + 1 }}</strong></td>
+                    {% for star in values[ncol*k:ncol*k+ncol] %}
+                    <td>
+                    {% if star|count > 0 %}
+                        <a href="apogee.apo25m.s.stars.{{locid}}.{{star[0]}}.png">
+                            <img src="apogee.apo25m.s.stars.{{locid}}.{{star[0]}}.png" alt="apogee.apo25m.s.stars.{{locid}}.{{star[0]}}" />
+
+                        </a><br />
+                        <var>T</var><sub>eff</sub> = {{ "%.2f"|format(star[1]) }}<br />
+                        log&nbsp;<var>g</var> = {{ "%.2f"|format(star[2]) }}<br />
+                        [M/H] = {{ "%.2f"|format(star[3]) }}<br />
+                        <a href="{{star[4]|e}}">SAS</a>&nbsp;&nbsp;<a href="{{star[5]|e}}">CAS</a>
+                    {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+    </body>
+</html>

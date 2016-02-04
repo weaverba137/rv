@@ -20,6 +20,7 @@ stars = None
 locids = None
 tmass_ids = None
 
+
 def load_app_data():
     """Load the global data needed by the application.
     """
@@ -123,4 +124,4 @@ def data(locid, tmass_id, Q):
 
 if __name__ == '__main__':
     load_app_data()
-    app.run(port=56789)  #, debug=True)
+    app.run(port=56789)  # , debug=True)

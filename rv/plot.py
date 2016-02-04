@@ -6,13 +6,13 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import matplotlib
+matplotlib.use('Agg')
+matplotlib.rcParams['figure.figsize'] = (10.0, 10.0)
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import fontManager, FontProperties
 #
 # Configure plots
 #
-matplotlib.use('Agg')
-matplotlib.rcParams['figure.figsize'] = (10.0, 10.0)
 legendfont = FontProperties(size='medium')
 titlefont = FontProperties(size='x-large')
 
