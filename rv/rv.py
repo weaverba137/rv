@@ -95,10 +95,10 @@ def data(locid, tmass_id, Q):
         data.fit2 = good_fits[k[1]]
         day_data = days.tolist()
         json_data = {"Q": Q,
-                     'fit1': [[day_data[d], model(data.fit1.x, days).tolist()]
-                              for d in range(len(day_data))],
-                     'fit2': [[day_data[d], model(data.fit2.x, days).tolist()]
-                              for d in range(len(day_data))],
+                     'fit1': zip(days.tolist(),
+                                 model(data.fit1.x, days).tolist()),
+                     'fit2': zip(days.tolist(),
+                                 model(data.fit2.x, days).tolist()),
                      }
         json_data.update(data.json)
         response = jsonify(**json_data)
