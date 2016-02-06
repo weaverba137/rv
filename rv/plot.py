@@ -48,11 +48,11 @@ def diagnostic_plots(stars, options):
     P2 = list()
     for s in stars:
         nvisit.append(stars[s].nvisits)
-        if 'fit1' in stars[s]:
+        if stars[s].fit1 is not None:
             kappa1.append(hypot(stars[s].fit1[1], stars[s].fit1[2]))
             # phi1.append(arctan2(stars[s].fit1[2], stars[s].fit1[1]))
             P1.append(2.0*pi/stars[s].fit1[3])
-        if 'fit2' in stars[s]:
+        if stars[s].fit2 is not None:
             kappa2.append(hypot(stars[s].fit2[1], stars[s].fit2[2]))
             # phi2.append(arctan2(stars[s].fit2[2], stars[s].fit2[1]))
             P2.append(2.0*pi/stars[s].fit2[3])
@@ -60,6 +60,7 @@ def diagnostic_plots(stars, options):
     ax = inthist(nvisit, True)
     foo = ax.set_xlabel('Number of Visits')
     foo = ax.set_ylabel('N')
+    foo = ax.set_ylim(0, 600)
     fig = ax.get_figure()
     fig.savefig(join(options.plotDir, 'nvisit.png'))
     fig.clf()

@@ -9,12 +9,19 @@ from __future__ import (absolute_import, division, print_function,
 
 def main():
     """Entry point for the command-line script, :command:`rv`.
+
+    Returns
+    -------
+    :class:`int`
+        An integer suitable for passing to :func:`sys.exit`.
     """
     #
     # Imports
     #
+    from pkg_resources import resource_filename
     from os import symlink
-    from os.path import join
+    from os.path import exists, join
+    from shutil import copy
     from .fitter import fitter
     from .util import rv_options, rv_data, create_index
     from .plot import diagnostic_plots, rv_plot
@@ -29,6 +36,9 @@ def main():
     #
     # Plot All
     #
+    if not exists(join(options.plotDir, 'insufficient.png')):
+        copy(resource_filename('rv', 'static/img/insufficient.png'),
+             options.plotDir)
     if options.plot:
         for s in stars:
             if stars[s].fittable:

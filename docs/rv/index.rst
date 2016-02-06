@@ -67,3 +67,4 @@ Reference/API
 
 .. automodapi:: rv.util
     :no-inheritance-diagram:
+    :skip: issubdtype, append, array

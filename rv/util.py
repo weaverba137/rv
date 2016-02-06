@@ -55,6 +55,48 @@ def rv_options(description="RV", set_args=None):
 
 class Star(object):
     """Simple object to hold data and metadata about a star.
+
+    Parameters
+    ----------
+    row : :class:`~astropy.io.fits.fitsrec.FITS_record`
+        Row from a FITS binary table.
+    mjd_zero : :class:`int`
+        The offset to the MJD, to make the range of days reasonable.
+
+    Attributes
+    ----------
+    apstar_id : :class:`str`
+        The "fully qualified" ID of the object.
+    cas_base_url : :class:`str`
+        Used to construct links to data on CAS.
+    commiss : :class:`int`
+        The commissioning flag.
+    fit1 : :class:`~scipy.optimize.OptimizeResult`
+        Placeholder for the best fit information.
+    fit2 : :class:`~scipy.optimize.OptimizeResult`
+        Placeholder for the second-best fit information.
+    jd2mjd : :class:`float`
+        The offset from Julian Day to Modified Julian Day.
+    locid : :class:`int`
+        The location ID.
+    logg : :class:`float`
+        The surface gravity.
+    mh : :class:`float`
+        The metallicity.
+    min_visits : :class:`int`
+        The number of data points should be greater than this for a viable fit.
+    mjd_zero : :class:`int`
+        Stores the corresponding input parameter.
+    sas_base_url : :class:`str`
+        Used to construct links to data on SAS.
+    teff : :class:`float`
+        The effective temperature.
+    tmassid : :class:`str`
+        The ID used for targeting the object.
+    vhelio_avg : :class:`float`
+        The average heliocentric velocity.
+    vscatter : :class:`float`
+        The error on `vhelio_avg`.
     """
     sas_base_url = 'http://mirror.sdss3.org/irSpectrumDetail'
     cas_base_url = "http://skyserver.sdss.org/dr12/en/tools/explore/Summary.aspx?apid="
@@ -62,8 +104,6 @@ class Star(object):
     min_visits = 5  # number of data points required for viable fit.
 
     def __init__(self, row, mjd_zero):
-        """Initialize with a row from a FITS file.
-        """
         self.mjd_zero = mjd_zero
         self.apstar_id = str(row['apstar_id'])
         foo = self.apstar_id.split('.')
@@ -177,10 +217,28 @@ class Star(object):
             self._json_data['mh'] = self.mh
             self._json_data['vhelio_avg'] = self.vhelio_avg
             self._json_data['vscatter'] = self.vscatter
+            if self.fit1 is None:
+                self._json_data['fit1_param'] = None
+            else:
+                self._json_data['fit1_param'] = self.fit1.x.tolist()
+            if self.fit2 is None:
+                self._json_data['fit2_param'] = None
+            else:
+                self._json_data['fit2_param'] = self.fit2.x.tolist()
         return self._json_data
 
     def append(self, row):
         """Add data to object already initialized.
+
+        Parameters
+        ----------
+        row : :class:`~astropy.io.fits.fitsrec.FITS_record`
+            Row from a FITS binary table.
+
+        Returns
+        -------
+        :class:`Star`
+            Returns the instance, in case you need to chain.
         """
         self._mjd_list = append(self._mjd_list,
                                 row['jd'] - self.jd2mjd - self.mjd_zero)
