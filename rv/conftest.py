@@ -14,8 +14,14 @@ from astropy.tests.pytest_plugins import *
 try:
     PYTEST_HEADER_MODULES['Astropy'] = 'astropy'
     PYTEST_HEADER_MODULES['Flask'] = 'flask'
-    del PYTEST_HEADER_MODULES['h5py']
-    del PYTEST_HEADER_MODULES['Pandas']
+    try:
+        del PYTEST_HEADER_MODULES['h5py']
+    except KeyError:
+        pass
+    try:
+        del PYTEST_HEADER_MODULES['Pandas']
+    except KeyError:
+        pass
 except NameError:  # needed to support Astropy < 1.0
     pass
 
