@@ -74,8 +74,7 @@ def star(locid, tmass_id):
                            locids=locids, locid=locid,
                            stars=sorted(tmass_ids[locid]),
                            tmass_id=tmass_id,
-                           data=stars[apstar_id]
-                           teff=data['teff'])
+                           data=stars[apstar_id])
 
 
 @app.route("/<int:locid>/<tmass_id>/<int:Q>")
