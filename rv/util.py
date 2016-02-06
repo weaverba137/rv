@@ -5,6 +5,7 @@
 #
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
+from numpy import issubdtype, append, array
 
 
 def rv_options(description="RV", set_args=None):
@@ -52,6 +53,143 @@ def rv_options(description="RV", set_args=None):
     return options
 
 
+class Star(object):
+    """Simple object to hold data and metadata about a star.
+    """
+    sas_base_url = 'http://mirror.sdss3.org/irSpectrumDetail'
+    cas_base_url = "http://skyserver.sdss.org/dr12/en/tools/explore/Summary.aspx?apid="
+    jd2mjd = 2400000.5
+    min_visits = 5  # number of data points required for viable fit.
+
+    def __init__(self, row, mjd_zero):
+        """Initialize with a row from a FITS file.
+        """
+        self.mjd_zero = mjd_zero
+        self.apstar_id = str(row['apstar_id'])
+        foo = self.apstar_id.split('.')
+        self.commiss = int(foo[2] == 'c')
+        self.locid = int(foo[4])
+        self.tmassid = foo[5]
+        self.teff = float(row['teff'])
+        self.logg = float(row['logg'])
+        self.mh = float(row['param_m_h'])
+        self.vhelio_avg = float(row['vhelio_avg'])
+        self.vscatter = float(row['vscatter'])
+        self.fit1 = None
+        self.fit2 = None
+        self._mjd_list = array((row['jd'] - self.jd2mjd - self.mjd_zero,))
+        self._vhelio_list = array((row['vhelio'],))
+        self._vrelerr_list = array((row['vrelerr'],))
+        self._snr_list = array((row['snr'],))
+        self._clean = None
+        self._mjd = None
+        self._vhelio = None
+        self._vrelerr = None
+        self._snr = None
+        self._json_data = None
+        self._nvisits = None
+        return
+
+    @property
+    def sas(self):
+        """URL for this object on SAS.
+        """
+        return "{0.sas_base_url}?locid={0.locid:d}&commiss={0.commiss:d}&apogeeid={0.tmassid}".format(self)
+
+    @property
+    def cas(self):
+        """URL for this object on SkyServer.
+        """
+        return self.cas_base_url + self.apstar_id
+
+    @property
+    def clean(self):
+        """A boolean array indicating where the velocity has reasonable values.
+        """
+        if self._clean is None:
+            self._clean = self._vhelio_list < 3e5
+        return self._clean
+
+    @property
+    def mjd(self):
+        """Date of observation.
+        """
+        if self._mjd is None:
+            self._mjd = self._mjd_list[self.clean]
+        return self._mjd
+
+    @property
+    def vhelio(self):
+        """Heliocentric radial velocity.
+        """
+        if self._vhelio is None:
+            self._vhelio = self._vhelio_list[self.clean]
+        return self._vhelio
+
+    @property
+    def vrelerr(self):
+        """Radial velocity error.
+        """
+        if self._vrelerr is None:
+            self._vrelerr = self._vrelerr_list[self.clean]
+        return self._vrelerr
+
+    @property
+    def snr(self):
+        """Signal-to-noise ratio.
+        """
+        if self._snr is None:
+            self._snr = self._snr_list[self.clean]
+        return self._snr
+
+    @property
+    def nvisits(self):
+        """Number of data points, excluding bad data.
+        """
+        if self._nvisits is None:
+            self._nvisits = len(self.mjd)
+        return self._nvisits
+
+    @property
+    def fittable(self):
+        """``True`` if there are enough data points for a viable fit.
+        """
+        return self.nvisits > self.min_visits
+
+    @property
+    def json(self):
+        """Encode the Star data as a dictionary that can be converted to
+        JSON format.
+        """
+        if self._json_data is None:
+            self._json_data = dict()
+            self._json_data['mjd'] = self.mjd.tolist()
+            self._json_data['vhelio'] = self.vhelio.tolist()
+            self._json_data['vrelerr'] = self.vrelerr.tolist()
+            self._json_data['snr'] = self.snr.tolist()
+            self._json_data['mjd_zero'] = self.mjd_zero
+            self._json_data['apstar_id'] = self.apstar_id
+            self._json_data['commiss'] = self.commiss
+            self._json_data['locid'] = self.locid
+            self._json_data['tmassid'] = self.tmassid
+            self._json_data['teff'] = self.teff
+            self._json_data['logg'] = self.logg
+            self._json_data['mh'] = self.mh
+            self._json_data['vhelio_avg'] = self.vhelio_avg
+            self._json_data['vscatter'] = self.vscatter
+        return self._json_data
+
+    def append(self, row):
+        """Add data to object already initialized.
+        """
+        self._mjd_list = append(self._mjd_list,
+                                row['jd'] - self.jd2mjd - self.mjd_zero)
+        self._vhelio_list = append(self._vhelio_list, row['vhelio'])
+        self._vrelerr_list = append(self._vrelerr_list, row['vrelerr'])
+        self._snr_list = append(self._snr_list, row['snr'])
+        return self
+
+
 def rv_data(options):
     """Load RV data.
 
@@ -70,7 +208,6 @@ def rv_data(options):
     import cPickle as pickle
     from collections import OrderedDict
     import astropy.io.fits as pyfits
-    from numpy import array
     #
     #
     #
@@ -88,31 +225,11 @@ def rv_data(options):
         # Sort the data
         #
         stars = OrderedDict()
-        sas_base_url = 'http://mirror.sdss3.org/irSpectrumDetail'
-        cas_base_url = "http://skyserver.sdss.org/dr12/en/tools/explore/Summary.aspx?apid="
         for row in data:
-            if row['apstar_id'] not in stars:
-                foo = row['apstar_id'].split('.')
-                locid = int(foo[4])
-                c = int(foo[2] == 'c')
-                sas_url = "{0}?locid={1:d}&commiss={2:d}&apogeeid={3}".format(sas_base_url, locid, c, foo[5])
-                cas_url = cas_base_url + row['apstar_id']
-                stars[row['apstar_id']] = {'mjd': [], 'vhelio': [],
-                                           'vrelerr': [], 'teff': row['teff'],
-                                           'logg': row['logg'],
-                                           'mh': row['param_m_h'], 'snr': [],
-                                           'vhelio_avg': row['vhelio_avg'],
-                                           'vscatter': row['vscatter'],
-                                           'commiss': c, 'locid': int(foo[4]),
-                                           'tmassid': foo[5],
-                                           'sas': sas_url, 'cas': cas_url}
-            stars[row['apstar_id']]['mjd'].append(row['jd'] - 2400000.5 - options.mjd_zero)
-            stars[row['apstar_id']]['vhelio'].append(row['vhelio'])
-            stars[row['apstar_id']]['vrelerr'].append(row['vrelerr'])
-            stars[row['apstar_id']]['snr'].append(row['snr'])
-        for s in stars:
-            for c in ('mjd', 'vhelio', 'vrelerr', 'snr'):
-                stars[s][c] = array(stars[s][c])
+            if row['apstar_id'] in stars:
+                stars[row['apstar_id']].append(row)
+            else:
+                stars[row['apstar_id']] = Star(row, options.mjd_zero)
         #
         # Save the data
         #
@@ -140,16 +257,16 @@ def create_index(stars, ncol=6):
     from jinja2 import Environment, PackageLoader
     tables = OrderedDict()
     for s in stars:
-        stuple = (stars[s]['tmassid'],
-                  stars[s]['teff'],
-                  stars[s]['logg'],
-                  stars[s]['mh'],
-                  stars[s]['sas'],
-                  stars[s]['cas'],)
-        if stars[s]['locid'] in tables:
-            tables[stars[s]['locid']].append(stuple)
+        stuple = (stars[s].tmassid,
+                  stars[s].teff,
+                  stars[s].logg,
+                  stars[s].mh,
+                  stars[s].sas,
+                  stars[s].cas,)
+        if stars[s].locid in tables:
+            tables[stars[s].locid].append(stuple)
         else:
-            tables[stars[s]['locid']] = [stuple]
+            tables[stars[s].locid] = [stuple]
     #
     # Pad tables out to multiples of ncol
     #

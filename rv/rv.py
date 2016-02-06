@@ -58,8 +58,9 @@ def doc():
 def list_stars(locid):
     """Return the set of stars that match a given location ID.
     """
-    return render_template('stars.html', title=str(locid), locids=locids,
-                           locid=locid, stars=sorted(tmass_ids[locid]))
+    return render_template('stars.html', title="RV - {0:d}".format(locid),
+                           locids=locids, locid=locid,
+                           stars=sorted(tmass_ids[locid]))
 
 
 @app.route("/<int:locid>/<tmass_id>")
@@ -69,13 +70,12 @@ def star(locid, tmass_id):
     apstar_id = 'apogee.apo25m.s.stars.{0:d}.{1}'.format(locid, tmass_id)
     data = stars[apstar_id]
     return render_template('star.html',
-                           title="{0:d}.{1}".format(locid, tmass_id),
-                           locids=locids, teff=data['teff'],
-                           logg=data['logg'], mh=data['mh'],
-                           sas=data['sas'], cas=data['cas'],
-                           apstar_id=apstar_id, locid=locid,
-                           stars=sorted(tmass_ids[locid]), tmass_id=tmass_id,
-                           mjd_zero=options.mjd_zero)
+                           title="RV - {0:d}.{1}".format(locid, tmass_id),
+                           locids=locids, locid=locid,
+                           stars=sorted(tmass_ids[locid]),
+                           tmass_id=tmass_id,
+                           data=stars[apstar_id]
+                           teff=data['teff'])
 
 
 @app.route("/<int:locid>/<tmass_id>/<int:Q>")
@@ -91,13 +91,11 @@ def data(locid, tmass_id, Q):
         good_fits = [f for f in fits if f.success]
         chi = np.array([f.fun for f in fits if f.success])
         k = np.argsort(chi)
-        days = np.linspace(data['mjd'][0], data['mjd'][-1], 100)
+        days = np.linspace(data.mjd[0], data.mjd[-1], 100)
         fit1 = model(good_fits[k[0]].x, days).tolist()
         fit2 = model(good_fits[k[1]].x, days).tolist()
         day_data = days.tolist()
         json_data = {"Q": Q,
-                     'apstar_id': apstar_id,
-                     'mjd_zero': options.mjd_zero,
                      'fit1': [[day_data[d], fit1[d]]
                               for d in range(len(day_data))],
                      'fit2': [[day_data[d], fit2[d]]
@@ -105,18 +103,7 @@ def data(locid, tmass_id, Q):
                      'fit1_param': good_fits[k[0]].x.tolist(),
                      'fit2_param': good_fits[k[1]].x.tolist()
                      }
-        for k in data:
-            if k in ('mjd', 'vhelio', 'vrelerr', 'snr'):
-                json_data[k] = data[k].tolist()
-            else:
-                try:
-                    f = np.issubdtype(data[k], float)
-                except:
-                    f = False
-                if f:
-                    json_data[k] = float(data[k])
-                else:
-                    json_data[k] = data[k]
+        json_data.update(data.json)
         response = jsonify(**json_data)
         cache.set(apstar_id+'.'+str(Q), response, timeout=10*60)
     return response

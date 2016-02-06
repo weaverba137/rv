@@ -29,8 +29,8 @@ def diagnostic_plots(stars, options):
     """
     from numpy import array, hypot, arctan2, pi
     from os.path import join
-    max_mjd = array([stars[s]['mjd'][-1] for s in stars])
-    min_mjd = array([stars[s]['mjd'][0] for s in stars])
+    max_mjd = array([stars[s].mjd[-1] for s in stars])
+    min_mjd = array([stars[s].mjd[0] for s in stars])
     delta_mjd = max_mjd - min_mjd
     fig = plt.figure(dpi=100)
     ax = fig.add_subplot(111)
@@ -47,15 +47,15 @@ def diagnostic_plots(stars, options):
     kappa2 = list()
     P2 = list()
     for s in stars:
-        nvisit.append(len(stars[s]['mjd']))
+        nvisit.append(stars[s].nvisits)
         if 'fit1' in stars[s]:
-            kappa1.append(hypot(stars[s]['fit1'][1], stars[s]['fit1'][2]))
-            # phi1.append(arctan2(stars[s]['fit1'][2], stars[s]['fit1'][1]))
-            P1.append(2.0*pi/stars[s]['fit1'][3])
+            kappa1.append(hypot(stars[s].fit1[1], stars[s].fit1[2]))
+            # phi1.append(arctan2(stars[s].fit1[2], stars[s].fit1[1]))
+            P1.append(2.0*pi/stars[s].fit1[3])
         if 'fit2' in stars[s]:
-            kappa2.append(hypot(stars[s]['fit2'][1], stars[s]['fit2'][2]))
-            # phi2.append(arctan2(stars[s]['fit2'][2], stars[s]['fit2'][1]))
-            P2.append(2.0*pi/stars[s]['fit2'][3])
+            kappa2.append(hypot(stars[s].fit2[1], stars[s].fit2[2]))
+            # phi2.append(arctan2(stars[s].fit2[2], stars[s].fit2[1]))
+            P2.append(2.0*pi/stars[s].fit2[3])
     nvisit = array(nvisit)
     ax = inthist(nvisit, True)
     foo = ax.set_xlabel('Number of Visits')
@@ -99,44 +99,42 @@ def rv_plot(data, fits, options):
     from os.path import join
     from numpy import array, argsort, linspace
     from .model import model
-    apstar_id = 'apogee.apo25m.s.stars.{0:d}.{1}'.format(data['locid'],
-                                                         data['tmassid'])
     good_fits = [f for f in fits if f.success]
     chi = array([f.fun for f in fits if f.success])
     k = argsort(chi)
     # print(good_fits(k[0]))
-    days = linspace(data['mjd'][0], data['mjd'][-1], 100)
+    days = linspace(data.mjd[0], data.mjd[-1], 100)
     fig = plt.figure(dpi=100)
     plt.subplots_adjust(hspace=0.001)
     ax = fig.add_subplot(211)
-    p0 = ax.errorbar(data['mjd'], data['vhelio'], yerr=data['vrelerr'],
+    p0 = ax.errorbar(data.mjd, data.vhelio, yerr=data.vrelerr,
                      fmt='ks')
-    p1 = ax.plot([data['mjd'][0], data['mjd'][-1]],
-                 [data['vhelio_avg'], data['vhelio_avg']], 'b-')
-    p2 = ax.plot([data['mjd'][0], data['mjd'][-1]],
-                 [data['vhelio_avg']+data['vscatter'],
-                  data['vhelio_avg']+data['vscatter']], 'b--')
-    p3 = ax.plot([data['mjd'][0], data['mjd'][-1]],
-                 [data['vhelio_avg']-data['vscatter'],
-                  data['vhelio_avg']-data['vscatter']], 'b--')
+    p1 = ax.plot([data.mjd[0], data.mjd[-1]],
+                 [data.vhelio_avg, data.vhelio_avg], 'b-')
+    p2 = ax.plot([data.mjd[0], data.mjd[-1]],
+                 [data.vhelio_avg+data.vscatter,
+                  data.vhelio_avg+data.vscatter], 'b--')
+    p3 = ax.plot([data.mjd[0], data.mjd[-1]],
+                 [data.vhelio_avg-data.vscatter,
+                  data.vhelio_avg-data.vscatter], 'b--')
     p4 = ax.plot(days, model(good_fits[k[0]].x, days), 'r-')
     p5 = ax.plot(days, model(good_fits[k[1]].x, days), 'r--')
     # foo = [l.set_label(WDs[f]['labels'][k]) for k, l in enumerate(p)]
-    # foo = ax.set_xlabel('MJD - {0:d}'.format(options.mjd_zero),
+    # foo = ax.set_xlabel('MJD - {0:d}'.format(data.mjd_zero),
     #                     fontproperties=titlefont)
     foo = ax.set_ylabel('Heliocentric Velocity [km/s]',
                         fontproperties=titlefont)
-    foo = ax.set_title(apstar_id, fontproperties=titlefont)
+    foo = ax.set_title(data.apstar_id, fontproperties=titlefont)
     foo = ax.grid(True)
     # leg = ax.legend(loc=1, prop=legendfont, numpoints=1)
     foo = ax.set_xticklabels([])
     ax = fig.add_subplot(212)
-    p0 = ax.plot(data['mjd'], data['snr'], 'ks')
-    foo = ax.set_xlabel('MJD - {0:d}'.format(options.mjd_zero),
+    p0 = ax.plot(data.mjd, data.snr, 'ks')
+    foo = ax.set_xlabel('MJD - {0:d}'.format(data.mjd_zero),
                         fontproperties=titlefont)
     foo = ax.set_ylabel('S/N', fontproperties=titlefont)
     foo = ax.grid(True)
-    fig.savefig(join(options.plotDir, apstar_id+'.png'))
+    fig.savefig(join(options.plotDir, data.apstar_id+'.png'))
     fig.clf()
     plt.close(fig)
     return (good_fits[k[0]].x, good_fits[k[1]].x)

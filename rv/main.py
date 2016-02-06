@@ -13,6 +13,7 @@ def main():
     #
     # Imports
     #
+    from os import symlink
     from os.path import join
     from .fitter import fitter
     from .util import rv_options, rv_data, create_index
@@ -30,11 +31,15 @@ def main():
     #
     if options.plot:
         for s in stars:
-            print(s)
-            fits = fitter(stars[s], options)
-            fit1, fit2 = rv_plot(stars[s], fits, options)
-            stars[s]['fit1'] = fit1
-            stars[s]['fit2'] = fit2
+            if stars[s].fittable:
+                print(s)
+                fits = fitter(stars[s], options)
+                fit1, fit2 = rv_plot(stars[s], fits, options)
+                stars[s].fit1 = fit1
+                stars[s].fit2 = fit2
+            else:
+                print("{0} has insufficient data.".format(s))
+                symlink('insufficient.png', s+'.png')
     #
     # Create index.html
     #

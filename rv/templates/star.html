@@ -27,14 +27,14 @@
 <div class="col-md-8">
 {% if tmass_id %}
 <h2>{{tmass_id}}</h2>
-<p><a href="{{sas}}">SAS</a>&nbsp;<a href="{{cas}}">CAS</a>&nbsp;<a href="http://sdss.physics.nyu.edu/apogee-rv/{{apstar_id}}.png">Image</a></p>
+<p><a href="{{data.sas}}">SAS</a>&nbsp;<a href="{{data.cas}}">CAS</a>&nbsp;<a href="http://sdss.physics.nyu.edu/apogee-rv/{{data.apstar_id}}.png">Image</a></p>
 <dl class="dl-horizontal">
     <dt><var>T</var><sub>eff</sub></dt>
-    <dd>{{teff}}&nbsp;K</dd>
+    <dd>{{data.teff}}&nbsp;K</dd>
     <dt>log<sub>10</sub>&nbsp;<var>g</var><dt>
-    <dd>{{logg}}</dd>
+    <dd>{{data.logg}}</dd>
     <dt>[M/H]</dt>
-    <dd>{{mh}}</dd>
+    <dd>{{data.mh}}</dd>
     <dt>Model</dt>
     <dd>\( v_0 + \kappa \sin(2 \pi t/P + \phi) \)</dd>
     <dt><var>v</var><sub>0</sub></dt>
@@ -70,7 +70,7 @@
 {# <p><span class="rotate">Rotated Text</span></p> #}
 <div id="plot_area" class="flot-plot"></div>
 <div id="SNR_area" class="flot-plot"></div>
-{# <p class="text-center">MJD&nbsp;&ndash;&nbsp;{{mjd_zero}}</p> #}
+{# <p class="text-center">MJD&nbsp;&ndash;&nbsp;{{data.mjd_zero}}</p> #}
 {% else %}
 <h2>No Star.</h2>
 {% endif %}

@@ -51,11 +51,11 @@ def fitter(data, options):
         fitter_options['maxiter'] = 10000
     w0 = initial_period()
     fits = list()
-    fitter_args = (data['vhelio'], data['mjd'], data['vrelerr'], options.Q)
+    fitter_args = (data.vhelio, data.mjd, data.vrelerr, options.Q)
     fitter_bounds = ((None, None), (None, None), (None, None),
                      (2.0*np.pi*1.0e-6, 2.0*np.pi))
     for k in range(len(w0)):
-        p0 = np.array([data['vhelio_avg'], data['vscatter'], 0, w0[k]])
+        p0 = np.array([data.vhelio_avg, data.vscatter, 0, w0[k]])
         fit = minimize(obj, p0, args=fitter_args, method=options.method,
                        jac=dobj,  # hess=d2obj,
                        bounds=fitter_bounds, options=fitter_options)
