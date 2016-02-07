@@ -64,8 +64,8 @@ ORDER BY aspcap.apstar_id, visit.jd;
                             <img src="apogee.apo25m.s.stars.{{locid}}.{{star[0]}}.png" alt="apogee.apo25m.s.stars.{{locid}}.{{star[0]}}" />
 
                         </a><br />
-                        <var>T</var><sub>eff</sub> = {{ "%.2f"|format(star[1]) }}<br />
-                        log&nbsp;<var>g</var> = {{ "%.2f"|format(star[2]) }}<br />
+                        <var>T</var><sub>eff</sub> = {{ "%.2f"|format(star[1]) }} K<br />
+                        log<sub>10</sub>&nbsp;<var>g</var> = {{ "%.2f"|format(star[2]) }}<br />
                         [M/H] = {{ "%.2f"|format(star[3]) }}<br />
                         <a href="{{star[4]|e}}">SAS</a>&nbsp;&nbsp;<a href="{{star[5]|e}}">CAS</a>
                     {% endif %}

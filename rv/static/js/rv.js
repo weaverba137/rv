@@ -91,34 +91,39 @@ function onDataReceived(data) {
             "data": data.fit1,
             "color": "red",
             "points": {"show": false},
-            "lines": {"show": true}
+            "lines": {"show": true},
+            "shadowSize": 0
         },
         {
             "data": data.fit2,
             "color": "red",
             "points": {"show": false},
             "lines": {"show": false},
-            "dashes": {"show": true}
+            "dashes": {"show": true},
+            "shadowSize": 0
         },
         {
             "data": [[data.mjd[0], data.vhelio_avg], [data.mjd[data.mjd.length-1], data.vhelio_avg]],
             "color": "blue",
             "points": {"show": false},
-            "lines": {"show": true}
+            "lines": {"show": true},
+            "shadowSize": 0
         },
         {
             "data": [[data.mjd[0], data.vhelio_avg-data.vscatter], [data.mjd[data.mjd.length-1], data.vhelio_avg-data.vscatter]],
             "color": "blue",
             "points": {"show": false},
             "lines": {"show": false},
-            "dashes": {"show": true}
+            "dashes": {"show": true},
+            "shadowSize": 0
         },
         {
             "data": [[data.mjd[0], data.vhelio_avg+data.vscatter], [data.mjd[data.mjd.length-1], data.vhelio_avg+data.vscatter]],
             "color": "blue",
             "points": {"show": false},
             "lines": {"show": false},
-            "dashes": {"show": true}
+            "dashes": {"show": true},
+            "shadowSize": 0
         }
     ];
     snr = [
