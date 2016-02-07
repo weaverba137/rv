@@ -43,7 +43,8 @@ def main():
     #
     # Parse options
     #
-    options = rv_options(description="Create radial velocity plots for all stars.")
+    options = rv_options(description=("Create radial velocity plots " +
+                                      "for all stars."))
     #
     # Files
     #

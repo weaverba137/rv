@@ -4,6 +4,7 @@ import re
 import numpy as np
 from ..util import rv_options
 
+
 class TestUtil(object):
     """Test rv.util.
     """
@@ -20,6 +21,7 @@ class TestUtil(object):
         options = rv_options()
         assert not options.plot
         assert options.mjd_zero == 55800
-        options = rv_options(set_args=['--method', 'foobar', '--zero', '50000'])
+        options = rv_options(set_args=['--method', 'foobar',
+                                       '--zero', '50000'])
         assert options.method == 'foobar'
         assert options.mjd_zero == 50000

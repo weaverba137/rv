@@ -16,7 +16,8 @@ def rv_options(description="RV", set_args=None):
     description : :class:`str`, optional
         The overall description of the command-line program.
     set_args : :class:`list`, optional
-        A list that will be passed to :meth:`argparse.ArgumentParser.parse_args`.
+        A list that will be passed to
+        :meth:`argparse.ArgumentParser.parse_args`.
 
     Returns
     -------
@@ -36,7 +37,8 @@ def rv_options(description="RV", set_args=None):
                         help='Do not regenerate index file.')
     parser.add_argument('-m', '--method', action='store', dest='method',
                         default='L-BFGS-B', metavar='METHOD',
-                        help='Set the optimization method for scipy.optimize.minimize (default "L-BFGS-B").')
+                        help=('Set the optimization method for ' +
+                              'scipy.optimize.minimize (default "L-BFGS-B").'))
     parser.add_argument('-p', '--plot', action='store_true', dest='plot',
                         help='Produce plots.')
     parser.add_argument('-Q', '--q-value', action='store', type=float,
@@ -97,7 +99,8 @@ class Star(object):
         The error on `vhelio_avg`.
     """
     sas_base_url = 'http://mirror.sdss3.org/irSpectrumDetail'
-    cas_base_url = "http://skyserver.sdss.org/dr12/en/tools/explore/Summary.aspx?apid="
+    cas_base_url = ("http://skyserver.sdss.org/dr12/en/tools/" +
+                    "explore/Summary.aspx?apid=")
     jd2mjd = 2400000.5
     min_visits = 5  # number of data points required for viable fit.
 
@@ -132,7 +135,8 @@ class Star(object):
     def sas(self):
         """URL for this object on SAS.
         """
-        return "{0.sas_base_url}?locid={0.locid:d}&commiss={0.commiss:d}&apogeeid={0.tmassid}".format(self)
+        return ("{0.sas_base_url}?locid={0.locid:d}&commiss={0.commiss:d}&" +
+                "apogeeid={0.tmassid}").format(self)
 
     @property
     def cas(self):

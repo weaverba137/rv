@@ -61,8 +61,7 @@ class TestModel(object):
                            [[0.0, 0.0, 0.0, 0.0, 0.0],
                             [0.0, 0.0, -self.pi, 0.0, self.pipi],
                             [0.0, -self.pi2, 0.0, self.pi32, 0.0],
-                            [0.0, -pi2_sq, pi_sq, pi32_sq, -pipi_sq]
-                           ]])
+                            [0.0, -pi2_sq, pi_sq, pi32_sq, -pipi_sq]]])
         assert np.allclose(d2mdpdp(self.p, self.t), answer)
 
     def test_chi(self):
@@ -87,8 +86,7 @@ class TestModel(object):
         d_answer = np.array([[1.0, 1.0, 1.0, 1.0, 1.0],
                              [0.0, 1.0, 0.0, -1.0, 0.0],
                              [1.0, 0.0, -1.0, 0.0, 1.0],
-                             [0.0, -self.pi2, -self.pi, self.pi32, self.pipi]
-                            ])
+                             [0.0, -self.pi2, -self.pi, self.pi32, self.pipi]])
         answer = (-2.0*chi_answer/self.s)*d_answer
         Q_answer = answer * (1.0/(chi_answer**2 + 1.0)**2)
         assert np.allclose(df2dp(self.p, self.x, self.t, self.s), answer)
