@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import re
 import numpy as np
-from ..model import chin, d2mdpdp, dmdp, model
+from ..model import (model, dmdp, d2mdpdp, chin, f2, df2dp, d2f2dpdp,
+                     obj, dobj, d2obj)
 
 
 class TestModel(object):
@@ -69,3 +70,66 @@ class TestModel(object):
         """
         answer = np.array([1., -1., 1., 1., 1.])
         assert np.allclose(chin(self.p, self.x, self.t, self.s), answer)
+
+    def test_f2(self):
+        """Test the f2 function.
+        """
+        chi_answer = np.array([1., -1., 1., 1., 1.])
+        answer = chi_answer**2
+        Q_answer = answer**2/(answer**2 + 1.0)
+        assert np.allclose(f2(self.p, self.x, self.t, self.s), answer)
+        assert np.allclose(f2(self.p, self.x, self.t, self.s, 1.0), Q_answer)
+
+    def test_df2dp(self):
+        """Test the derivative of the f2 function.
+        """
+        chi_answer = np.array([1., -1., 1., 1., 1.])
+        d_answer = np.array([[1.0, 1.0, 1.0, 1.0, 1.0],
+                             [0.0, 1.0, 0.0, -1.0, 0.0],
+                             [1.0, 0.0, -1.0, 0.0, 1.0],
+                             [0.0, -self.pi2, -self.pi, self.pi32, self.pipi]
+                            ])
+        answer = (-2.0*chi_answer/self.s)*d_answer
+        Q_answer = answer * (1.0/(chi_answer**2 + 1.0)**2)
+        assert np.allclose(df2dp(self.p, self.x, self.t, self.s), answer)
+        assert np.allclose(df2dp(self.p, self.x, self.t, self.s, 1.0),
+                           Q_answer)
+
+    def test_d2f2dpdp(self):
+        """Test the second derivative of the f2 function.
+        """
+        H = np.zeros((self.p.size, self.p.size, self.t.size),
+                     dtype=self.p.dtype)
+        chi = chin(self.p, self.x, self.t, self.s)
+        d = dmdp(self.p, self.t)
+        dd = d2mdpdp(self.p, self.t)
+        for i in range(self.p.size):
+            for j in range(self.p.size):
+                H[i, j, :] = d[i, :] * d[j, :]
+        f = -2*chi/self.s
+        f2 = 2/self.s**2
+        answer = f2*H + f*dd
+        assert np.allclose(d2f2dpdp(self.p, self.x, self.t, self.s), answer)
+        f = -2*chi/self.s * (1.0 / (chi**2 + 1.0)**2)
+        f2 = 2*(1.0/self.s**2)*((1.0 - 3*chi**2)/(chi**2 + 1.0)**3)
+        Q_answer = f2*H + f*dd
+        assert np.allclose(d2f2dpdp(self.p, self.x, self.t, self.s, 1.0),
+                           Q_answer)
+
+    def test_obj(self):
+        """Test the objective function.
+        """
+        answer = f2(self.p, self.x, self.t, self.s).sum()
+        assert np.allclose(obj(self.p, self.x, self.t, self.s), answer)
+
+    def test_dobj(self):
+        """Test the derivative of the objective function.
+        """
+        answer = df2dp(self.p, self.x, self.t, self.s).sum(1)
+        assert np.allclose(dobj(self.p, self.x, self.t, self.s), answer)
+
+    def test_d2obj(self):
+        """Test the second derivative of the objective function.
+        """
+        answer = d2f2dpdp(self.p, self.x, self.t, self.s).sum(2)
+        assert np.allclose(d2obj(self.p, self.x, self.t, self.s), answer)

@@ -53,9 +53,6 @@ Reference/API
 .. automodapi:: rv.fitter
     :no-inheritance-diagram:
 
-.. automodapi:: rv.main
-    :no-inheritance-diagram:
-
 .. automodapi:: rv.model
     :no-inheritance-diagram:
 
