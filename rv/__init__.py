@@ -64,7 +64,9 @@ def main():
                 stars[s].fit2 = fit2
             else:
                 print("{0} has insufficient data.".format(s))
-                symlink('insufficient.png', s+'.png')
+                symlink(join(options.plotDir, 'insufficient.png'),
+                        join(options.plotDir, s+'.png'))
+        diagnostic_plots(stars, options)
     #
     # Create index.html
     #
@@ -72,9 +74,4 @@ def main():
         indexHtml = create_index(stars)
         with open(join(options.plotDir, 'index.html'), 'w') as i:
             i.write(indexHtml)
-    #
-    # Other diagnostics
-    #
-    if options.plot:
-        diagnostic_plots(stars, options)
     return 0
