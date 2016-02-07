@@ -29,8 +29,6 @@ def rv_options(description="RV", set_args=None):
     parser = ArgumentParser(description=description, prog='rvMain')
     parser.add_argument('-c', '--clobber', action='store_true', dest='clobber',
                         help='Overwrite any cache file(s).')
-    parser.add_argument('-d', '--diagnostics', action='store_true',
-                        dest='diag', help='Produce diagnostic plots.')
     parser.add_argument('-D', '--data-dir', action='store', dest='plotDir',
                         default=join(getenv('HOME'), 'Desktop', 'apogee-rv'),
                         metavar='DIR', help='Read data from DIR.')
