@@ -30,7 +30,7 @@ Other Links
 -----------
 
 * `apogee-rvvar mailing list <https://trac.sdss3.org/tracmailman/browser/private/apogee-rvvar/all/thread.html>`_
-* `apogee-mdwarfs mailing list https://trac.sdss3.org/tracmailman/browser/private/apogee-mdwarfs/all/thread.html>`_
+* `apogee-mdwarfs mailing list <https://trac.sdss3.org/tracmailman/browser/private/apogee-mdwarfs/all/thread.html>`_
    related to paper 116.
 * `APOGEE/binaries wiki page <https://trac.sdss3.org/wiki/APOGEE/binaries>`_
 * `HD280136 <https://trac.sdss3.org/wiki/APOGEE/HD280136>`_;
