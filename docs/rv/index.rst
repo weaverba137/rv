@@ -76,6 +76,7 @@ Weird Outliers
 * http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4147.2M07324839+2133141.png
 * http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4157.2M06510122+0217223.png
 * http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4241.2M19415155+2315463.png
+* http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4256.2M00312468+5334162.png
 
 Nice Curves
 -----------
@@ -106,7 +107,9 @@ Nice Curves
 * http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4248.2M19540171+2221001.png
 * http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4249.2M21234925+4534342.png
 * http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4255.2M20111794+1908468.png
+* http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4258.2M06041906+1401010.png
 * http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4258.2M06044843+1301132.png
+* http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4258.2M06080116+1326140.png
 * http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4411.2M06361879+0436447.png
 * http://sdss.physics.nyu.edu/apogee-rv/apogee.apo25m.s.stars.4481.2M13423943+1847550.png
 
