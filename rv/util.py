@@ -95,8 +95,6 @@ class Star(object):
         The ID used for targeting the object.
     vhelio_avg : :class:`float`
         The average heliocentric velocity.
-    visits : :class:`list`
-        The visit IDs corresponding to each observation.
     vscatter : :class:`float`
         The error on `vhelio_avg`.
     """
