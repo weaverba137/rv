@@ -6,6 +6,9 @@ function replot() {
     var plot_area = $('#plot_area');
     var SNR_area = $('#SNR_area')
     var plot_options = {
+        "grid": {
+            "hoverable": true
+        },
         "legend": {
             "show": false
         },
@@ -76,14 +79,14 @@ function onDataReceived(data) {
             "color": "black",
             "points": {
                 "show": true,
-                "radius": 0,
+                // "radius": 0,
                 "errorbars": "y",
                 "yerr": {
                     "show": true,
                     "upperCap": "-",
                     "lowerCap": "-",
                     "radius": 2
-                }
+                },
             },
             "lines": {"show": false}
         },
@@ -172,6 +175,45 @@ function load_data() {
     }
 }
 //
+//
+//
+function showTooltip(item) {
+    // var contents, id, tooltip_css;
+    // id = this.getID(item.seriesIndex, item.dataIndex);
+    // contents = "" + (this.getName(id)) + " (" + (this.formatPosition(id)) + ")";
+    var contents = "Time: " + item.datapoint[0].toFixed(2) + " d<br/>RV: " +
+        item.datapoint[1].toFixed(2) + " &pm; " + 
+        item.datapoint[2].toFixed(2) + " km/s";
+    var tooltip_css = {
+        position: 'absolute',
+        display: 'none',
+        top: item.pageY + 5,
+        left: item.pageX + 5,
+        border: '1px solid gray',
+        padding: '2px',
+        "background-color": 'silver',
+        opacity: 0.8
+    };
+    $("<div id=\"hovertip\"/>").html(contents).css(tooltip_css).appendTo('body').fadeIn(200);
+}
+//
+//
+//
+function handle_hover(event, pos, item) {
+    if (item) {
+        if (item.seriesIndex == 0) {
+            if (previousPoint != item.dataIndex) {
+                $('#hovertip').remove();
+                showTooltip(item);
+                previousPoint = item.dataIndex;
+            }
+        }
+    } else {
+        $('#hovertip').remove();
+        previousPoint = null;
+    }
+}
+//
 // "Global" variables.
 //
 var rv = [];
@@ -182,6 +224,7 @@ var mjd_zero = 0;
 var Q = 0;
 var fit1_param = [];
 var fit2_param = [];
+var previousPoint = null;
 if (rv.length == 0) {
     load_data();
 }
@@ -192,5 +235,6 @@ $("#Q").change(load_data);
 //
 // Add zoom out event.
 //
+$("#plot_area").bind("plothover", handle_hover);
 $("#unzoom").click(function (event) { event.preventDefault(); replot(); });
 });
