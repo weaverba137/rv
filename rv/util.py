@@ -95,6 +95,8 @@ class Star(object):
         The ID used for targeting the object.
     vhelio_avg : :class:`float`
         The average heliocentric velocity.
+    visits : :class:`list`
+        The visit IDs corresponding to each observation.
     vscatter : :class:`float`
         The error on `vhelio_avg`.
     """
@@ -122,6 +124,7 @@ class Star(object):
         self._vhelio_list = array((row['vhelio'],))
         self._vrelerr_list = array((row['vrelerr'],))
         self._snr_list = array((row['snr'],))
+        self._visit_list = array((row['visit_id'],))
         self._clean = None
         self._mjd = None
         self._vhelio = None
@@ -129,6 +132,7 @@ class Star(object):
         self._snr = None
         self._json_data = None
         self._nvisits = None
+        self._visits = None
         return
 
     @property
@@ -193,6 +197,14 @@ class Star(object):
         return self._nvisits
 
     @property
+    def visits(self):
+        """Visit IDs corresponding to each observation, excluding bad data.
+        """
+        if self._visits is None:
+            self._visits = self._visit_list[self.clean]
+        return self._visits
+
+    @property
     def fittable(self):
         """``True`` if there are enough data points for a viable fit.
         """
@@ -209,6 +221,7 @@ class Star(object):
             self._json_data['vhelio'] = self.vhelio.tolist()
             self._json_data['vrelerr'] = self.vrelerr.tolist()
             self._json_data['snr'] = self.snr.tolist()
+            self._json_data['visits'] = self.visits.tolist()
             self._json_data['mjd_zero'] = self.mjd_zero
             self._json_data['apstar_id'] = self.apstar_id
             self._json_data['commiss'] = self.commiss
@@ -247,6 +260,7 @@ class Star(object):
         self._vhelio_list = append(self._vhelio_list, row['vhelio'])
         self._vrelerr_list = append(self._vrelerr_list, row['vrelerr'])
         self._snr_list = append(self._snr_list, row['snr'])
+        self._visit_list = append(self._visit_list, row['visit_id'])
         return self
 
 

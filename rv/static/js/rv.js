@@ -160,6 +160,7 @@ function onDataReceived(data) {
     mjd_zero = data.mjd_zero;
     fit1_param = data.fit1_param;
     fit2_param = data.fit2_param;
+    visits = data.visits;
 }
 //
 //
@@ -182,8 +183,9 @@ function showTooltip(item) {
     // id = this.getID(item.seriesIndex, item.dataIndex);
     // contents = "" + (this.getName(id)) + " (" + (this.formatPosition(id)) + ")";
     var contents = "Time: " + item.datapoint[0].toFixed(2) + " d<br/>RV: " +
-        item.datapoint[1].toFixed(2) + " &pm; " + 
-        item.datapoint[2].toFixed(2) + " km/s";
+        item.datapoint[1].toFixed(2) + " &pm; " +
+        item.datapoint[2].toFixed(2) + " km/s<br/>Visit: " +
+        visits[item.dataIndex];
     var tooltip_css = {
         position: 'absolute',
         display: 'none',
@@ -218,6 +220,7 @@ function handle_hover(event, pos, item) {
 //
 var rv = [];
 var snr = [];
+var visits = [];
 var xlim = null;
 var ylim = null;
 var mjd_zero = 0;
