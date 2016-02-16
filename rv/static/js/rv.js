@@ -7,7 +7,8 @@ function replot() {
     var SNR_area = $('#SNR_area')
     var plot_options = {
         "grid": {
-            "hoverable": true
+            "hoverable": true,
+            "clickable": true
         },
         "legend": {
             "show": false
@@ -216,6 +217,23 @@ function handle_hover(event, pos, item) {
     }
 }
 //
+//
+//
+function handle_click(event, pos, item) {
+    if (item) {
+        if (item.seriesIndex == 0) {
+            var visitId = visits[item.dataIndex];
+            var m = visitId.match(/apogee\.([^.]+)\.([^.]+)\.([^.]+)\.([^.]+)\.([^.]+)\.([^.]+)/);
+            if (m !== null) {
+                var url = "http://data.sdss3.org/irSpectrumDetail?plateid=" +
+                    m[4] + "&mjd=" + m[5] + "&fiber=" + m[6];
+                // alert(url);
+                window.open(url);
+            }
+        }
+    }
+}
+//
 // "Global" variables.
 //
 var rv = [];
@@ -239,5 +257,6 @@ $("#Q").change(load_data);
 // Add zoom out event.
 //
 $("#plot_area").bind("plothover", handle_hover);
+$("#plot_area").bind("plotclick", handle_click);
 $("#unzoom").click(function (event) { event.preventDefault(); replot(); });
 });
