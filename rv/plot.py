@@ -57,7 +57,7 @@ def diagnostic_plots(stars, options):
             # phi2.append(arctan2(stars[s].fit2[2], stars[s].fit2[1]))
             P2.append(2.0*pi/stars[s].fit2[3])
     nvisit = array(nvisit)
-    ax = inthist(nvisit, True)
+    ax = inthist(nvisit, True, color='b')
     foo = ax.set_xlabel('Number of Visits')
     foo = ax.set_ylabel('N')
     foo = ax.set_ylim(0, 600)
@@ -141,7 +141,7 @@ def rv_plot(data, fits, options):
     return (good_fits[k[0]].x, good_fits[k[1]].x)
 
 
-def inthist(foo, show=False):
+def inthist(foo, show=False, color='w'):
     """Create a histogram of integer values.
 
     Parameters
@@ -151,6 +151,8 @@ def inthist(foo, show=False):
     show : :class:`bool`, optional
         If ``True``, create a histogram and return the
         :class:`matplotlib.axes.Axes` instance.
+    color : :class:`str`, optional
+        This option will be passed to :meth:`~matplotlib.axes.Axes.bar`.
 
     Returns
     -------
@@ -168,7 +170,7 @@ def inthist(foo, show=False):
     if show:
         fig = plt.figure(dpi=100)
         ax = fig.add_subplot(111)
-        b = ax.bar(x, n, align='center', width=0.5, color='w')
+        b = ax.bar(x, n, align='center', width=0.5, color=color)
         ax.set_xlim(xmin-1, xmax+1)
         # ax.set_ylim(0, np.ceil(max(n)/10.0)*10.0)
         ax.set_ylim(0, 10**np.ceil(np.log10(max(n))))
