@@ -63,17 +63,6 @@ matrix:
         - python: 3.4
           env: ASTROPY_VERSION=development SETUP_CMD='test'
 
-        # Try all python versions with the latest numpy
-        - python: 2.7
-          env: SETUP_CMD='test'
-        - python: 3.3
-          env: SETUP_CMD='test'
-        - python: 3.4
-          env: SETUP_CMD='test'
-        # Postpone 3.5 tests due to a scipy conflict.
-        # - python: 3.5
-        #   env: SETUP_CMD='test'
-
         # Try older numpy versions
         - python: 2.7
           env: NUMPY_VERSION=1.8 SCIPY_VERSION=0.13 SETUP_CMD='test'
@@ -81,8 +70,8 @@ matrix:
           env: NUMPY_VERSION=1.7 SCIPY_VERSION=0.12 SETUP_CMD='test'
 
         # PEP 8 Compliance
-        - python: 2.7
-          env: MAIN_CMD='pep8' SETUP_CMD='--count rv'
+        # - python: 2.7
+        #   env: MAIN_CMD='pep8' SETUP_CMD='--count rv'
 
 before_install:
 
