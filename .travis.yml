@@ -56,22 +56,33 @@ matrix:
           env: SETUP_CMD='build_sphinx -w'
 
         # Try Astropy development version
-        # - python: 2.7
-        #   env: ASTROPY_VERSION=development
+        - python: 2.7
+          env: ASTROPY_VERSION=development SETUP_CMD='test'
+        - python: 3.3
+          env: ASTROPY_VERSION=development SETUP_CMD='test'
+        - python: 3.4
+          env: ASTROPY_VERSION=development SETUP_CMD='test'
+
+        # Try all python versions with the latest numpy
+        - python: 2.7
+          env: SETUP_CMD='test'
+        - python: 3.3
+          env: SETUP_CMD='test'
+        - python: 3.4
+          env: SETUP_CMD='test'
+        # Postpone 3.5 tests due to a scipy conflict.
         # - python: 3.5
-        #   env: ASTROPY_VERSION=development
+        #   env: SETUP_CMD='test'
 
         # Try older numpy versions
         - python: 2.7
-          env: NUMPY_VERSION=1.8 SCIPY_VERSION=0.13
-        # - python: 2.7
-        #   env: NUMPY_VERSION=1.7
-        # - python: 2.7
-        #   env: NUMPY_VERSION=1.6
+          env: NUMPY_VERSION=1.8 SCIPY_VERSION=0.13 SETUP_CMD='test'
+        - python: 2.7
+          env: NUMPY_VERSION=1.7 SCIPY_VERSION=0.12 SETUP_CMD='test'
 
-        # PEP 8
-        # - python: 2.7
-        #   env: MAIN_CMD='pep8' SETUP_CMD='rv'
+        # PEP 8 Compliance
+        - python: 2.7
+          env: MAIN_CMD='pep8' SETUP_CMD='--count rv'
 
 before_install:
 
@@ -112,4 +123,4 @@ after_success:
     # If coveralls.io is set up for this package, uncomment the line
     # below and replace "packagename" with the name of your package.
     # The coveragerc file may be customized as needed for your package.
-    - if [[ $SETUP_CMD == 'test --coverage' ]]; then coveralls --rcfile='packagename/tests/coveragerc'; fi
+    - if [[ $SETUP_CMD == 'test --coverage' ]]; then coveralls --rcfile='rv/tests/coveragerc'; fi
