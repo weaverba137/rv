@@ -59,6 +59,9 @@ def main():
         for s in stars:
             if stars[s].fittable:
                 print(s)
+                if not stars[s].valid_flags:
+                    print(("{0} has inconsistent APOGEE_STARFLAG " +
+                           "values!").format(s))
                 fits = fitter(stars[s], options)
                 fit1, fit2 = rv_plot(stars[s], fits, options)
                 stars[s].fit1 = fit1

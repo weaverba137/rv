@@ -5,7 +5,7 @@
 #
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-from numpy import issubdtype, append, array
+from numpy import issubdtype, append, array, bitwise_and, bitwise_or
 
 
 def rv_options(description="RV", set_args=None):
@@ -151,6 +151,7 @@ class Star(object):
         self._synthvhelio = None
         self._synthvrelerr = None
         self._clean = None
+        self._valid_flags = None
         self._nvisits = None
         self._json_data = None
         self.fit1 = None
@@ -243,6 +244,18 @@ class Star(object):
         return self._clean
 
     @property
+    def valid_flags(self):
+        """Make sure that the flags are self-consistent.
+        """
+        if self._valid_flags is None:
+            self._valid_flags = ((self.ORstarflag ==
+                                  bitwise_or.reduce(self.visitstarflag))
+                                 and
+                                 (self.ANDstarflag ==
+                                  bitwise_and.reduce(self.visitstarflag)))
+        return self._valid_flags
+
+    @property
     def nvisits(self):
         """Number of data points, excluding bad data.
         """
@@ -310,6 +323,8 @@ class Star(object):
         self._snr_list = append(self._snr_list, row['snr'])
         self._mjd_list = append(self._mjd_list,
                                 row['jd'] - self.jd2mjd - self.mjd_zero)
+        self._visitstarflag_list = append(self._visitstarflag_list,
+                                          row['visitstarflag'])
         self._vhelio_list = append(self._vhelio_list, row['vhelio'])
         self._vrelerr_list = append(self._vrelerr_list, row['vrelerr'])
         self._synthvhelio_list = append(self._synthvhelio_list,
@@ -391,7 +406,9 @@ def create_index(stars, ncol=6):
                   stars[s].logg,
                   stars[s].mh,
                   stars[s].sas,
-                  stars[s].cas,)
+                  stars[s].cas,
+                  stars[s].ANDstarflag,
+                  stars[s].ORstarflag,)
         if stars[s].locid in tables:
             tables[stars[s].locid].append(stuple)
         else:

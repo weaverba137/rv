@@ -71,6 +71,8 @@ ORDER BY aspcap.apstar_id, visit.jd;
                         <var>T</var><sub>eff</sub> = {{ "%.2f"|format(star[1]) }} K<br />
                         log<sub>10</sub>&nbsp;<var>g</var> = {{ "%.2f"|format(star[2]) }}<br />
                         [M/H] = {{ "%.2f"|format(star[3]) }}<br />
+                        APOGEE_STARFLAG:<br>
+                        AND = {{ star[6] }};&nbsp;OR = {{ star[7] }}<br />
                         <a href="{{star[4]|e}}">SAS</a>&nbsp;&nbsp;<a href="{{star[5]|e}}">CAS</a>
                     {% endif %}
                     </td>
