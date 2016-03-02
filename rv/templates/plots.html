@@ -18,9 +18,13 @@ td {text-align: center;}
         <pre>
 SELECT aspcap.apstar_id, aspcap.teff, aspcap.logg, aspcap.param_m_h,
   star.vhelio_avg, star.vscatter, star.verr, star.verr_med,
+  star.synthvhelio_avg, star.synthvscatter, star.synthverr, star.synthverr_med,
+  star.starflag AS ORstarflag, star.andflag AS ANDstarflag,
   visit.visit_id, visit.ra, visit.dec, visit.glon, visit.glat,
-  visit.snr, visit.jd, visit.vhelio, visit.vrelerr
-INTO MyDB.apogee_vrel
+  visit.snr, visit.jd, visit.starflag AS visitstarflag,
+  visit.vhelio, visit.vrelerr,
+  visit.synthvhelio, visit.synthvrelerr
+INTO MyDB.apogee_vrel_v2
 FROM apogeeVisit     AS visit
 JOIN apogeeStarVisit AS starvisit ON visit.visit_id   = starvisit.visit_id
 JOIN aspcapStar      AS aspcap    ON aspcap.apstar_id = starvisit.apstar_id
