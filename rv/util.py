@@ -106,6 +106,9 @@ class Star(object):
 
     def __init__(self, row, mjd_zero):
         self.mjd_zero = mjd_zero
+        #
+        # Try to initialize data as close to the column order as possible.
+        #
         self.apstar_id = str(row['apstar_id'])
         foo = self.apstar_id.split('.')
         self.commiss = int(foo[2] == 'c')
@@ -116,21 +119,42 @@ class Star(object):
         self.mh = float(row['param_m_h'])
         self.vhelio_avg = float(row['vhelio_avg'])
         self.vscatter = float(row['vscatter'])
-        self.fit1 = None
-        self.fit2 = None
+        # self.verr = float(row['verr'])
+        # self.verr_med = float(row['verr'])
+        self.synthvhelio_avg = float(row['synthvhelio_avg'])
+        self.synthvscatter = float(row['synthvscatter'])
+        # self.synthverr = float(row['synthverr'])
+        # self.synthverr_med = float(row['synthverr'])
+        self.ORstarflag = int(row['ORstarflag'])
+        self.ANDstarflag = int(row['ANDstarflag'])
+        self._visit_list = array((row['visit_id'],))
+        # self.ra = float(row['ra'])
+        # self.dec = float(row['dec'])
+        # self.glon = float(row['glon'])
+        # self.glat = float(row['glat'])
+        self._snr_list = array((row['snr'],))
         self._mjd_list = array((row['jd'] - self.jd2mjd - self.mjd_zero,))
+        self._visitstarflag_list = array((row['visitstarflag'],))
         self._vhelio_list = array((row['vhelio'],))
         self._vrelerr_list = array((row['vrelerr'],))
-        self._snr_list = array((row['snr'],))
-        self._visit_list = array((row['visit_id'],))
-        self._clean = None
+        self._synthvhelio_list = array((row['synthvhelio'],))
+        self._synthvrelerr_list = array((row['synthvrelerr'],))
+        #
+        # Placeholders
+        #
+        self._visits = None
+        self._snr = None
         self._mjd = None
+        self._visitstarflag = None
         self._vhelio = None
         self._vrelerr = None
-        self._snr = None
-        self._json_data = None
+        self._synthvhelio = None
+        self._synthvrelerr = None
+        self._clean = None
         self._nvisits = None
-        self._visits = None
+        self._json_data = None
+        self.fit1 = None
+        self.fit2 = None
         return
 
     @property
@@ -147,12 +171,20 @@ class Star(object):
         return self.cas_base_url + self.apstar_id
 
     @property
-    def clean(self):
-        """A boolean array indicating where the velocity has reasonable values.
+    def visits(self):
+        """Visit IDs corresponding to each observation, excluding bad data.
         """
-        if self._clean is None:
-            self._clean = self._vhelio_list < 3e5
-        return self._clean
+        if self._visits is None:
+            self._visits = self._visit_list[self.clean]
+        return self._visits
+
+    @property
+    def snr(self):
+        """Signal-to-noise ratio.
+        """
+        if self._snr is None:
+            self._snr = self._snr_list[self.clean]
+        return self._snr
 
     @property
     def mjd(self):
@@ -161,6 +193,14 @@ class Star(object):
         if self._mjd is None:
             self._mjd = self._mjd_list[self.clean]
         return self._mjd
+
+    @property
+    def visitstarflag(self):
+        """Flags set for each visit.
+        """
+        if self._visitstarflag is None:
+            self._visitstarflag = self._visitstarflag_list[self.clean]
+        return self._visitstarflag
 
     @property
     def vhelio(self):
@@ -179,12 +219,28 @@ class Star(object):
         return self._vrelerr
 
     @property
-    def snr(self):
-        """Signal-to-noise ratio.
+    def synthvhelio(self):
+        """Heliocentric radial velocity, based on synthetic spectra.
         """
-        if self._snr is None:
-            self._snr = self._snr_list[self.clean]
-        return self._snr
+        if self._synthvhelio is None:
+            self._synthvhelio = self._synthvhelio_list[self.clean]
+        return self._synthvhelio
+
+    @property
+    def synthvrelerr(self):
+        """Radial velocity error, based on synthetic spectra..
+        """
+        if self._synthvrelerr is None:
+            self._synthvrelerr = self._synthvrelerr_list[self.clean]
+        return self._synthvrelerr
+
+    @property
+    def clean(self):
+        """A boolean array indicating where the velocity has reasonable values.
+        """
+        if self._clean is None:
+            self._clean = self._vhelio_list < 3e5
+        return self._clean
 
     @property
     def nvisits(self):
@@ -193,14 +249,6 @@ class Star(object):
         if self._nvisits is None:
             self._nvisits = len(self.mjd)
         return self._nvisits
-
-    @property
-    def visits(self):
-        """Visit IDs corresponding to each observation, excluding bad data.
-        """
-        if self._visits is None:
-            self._visits = self._visit_list[self.clean]
-        return self._visits
 
     @property
     def fittable(self):
@@ -215,11 +263,6 @@ class Star(object):
         """
         if self._json_data is None:
             self._json_data = dict()
-            self._json_data['mjd'] = self.mjd.tolist()
-            self._json_data['vhelio'] = self.vhelio.tolist()
-            self._json_data['vrelerr'] = self.vrelerr.tolist()
-            self._json_data['snr'] = self.snr.tolist()
-            self._json_data['visits'] = self.visits.tolist()
             self._json_data['mjd_zero'] = self.mjd_zero
             self._json_data['apstar_id'] = self.apstar_id
             self._json_data['commiss'] = self.commiss
@@ -230,6 +273,16 @@ class Star(object):
             self._json_data['mh'] = self.mh
             self._json_data['vhelio_avg'] = self.vhelio_avg
             self._json_data['vscatter'] = self.vscatter
+            self._json_data['synthvhelio_avg'] = self.synthvhelio_avg
+            self._json_data['synthvscatter'] = self.synthvscatter
+            self._json_data['visits'] = self.visits.tolist()
+            self._json_data['snr'] = self.snr.tolist()
+            self._json_data['mjd'] = self.mjd.tolist()
+            self._json_data['visitstarflag'] = self.visitstarflag.tolist()
+            self._json_data['vhelio'] = self.vhelio.tolist()
+            self._json_data['vrelerr'] = self.vrelerr.tolist()
+            self._json_data['synthvhelio'] = self.synthvhelio.tolist()
+            self._json_data['synthvrelerr'] = self.synthvrelerr.tolist()
             if self.fit1 is None:
                 self._json_data['fit1_param'] = None
             else:
@@ -253,12 +306,16 @@ class Star(object):
         :class:`Star`
             Returns the instance, in case you need to chain.
         """
+        self._visit_list = append(self._visit_list, row['visit_id'])
+        self._snr_list = append(self._snr_list, row['snr'])
         self._mjd_list = append(self._mjd_list,
                                 row['jd'] - self.jd2mjd - self.mjd_zero)
         self._vhelio_list = append(self._vhelio_list, row['vhelio'])
         self._vrelerr_list = append(self._vrelerr_list, row['vrelerr'])
-        self._snr_list = append(self._snr_list, row['snr'])
-        self._visit_list = append(self._visit_list, row['visit_id'])
+        self._synthvhelio_list = append(self._synthvhelio_list,
+                                        row['synthvhelio'])
+        self._synthvrelerr_list = append(self._synthvrelerr_list,
+                                         row['synthvrelerr'])
         return self
 
 
@@ -288,7 +345,7 @@ def rv_data(options):
         with open(f) as p:
             stars = pickle.load(p)
     else:
-        fit = join(options.plotDir, 'apogee_vrel_weaver.fit')
+        fit = join(options.plotDir, 'apogee_vrel_v2_weaver.fit')
         hdulist = pyfits.open(fit)
         data = hdulist[1].data
         hdulist.close()
