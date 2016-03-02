@@ -5,7 +5,7 @@
 #
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-from numpy import issubdtype, append, array, bitwise_and, bitwise_or
+from numpy import issubdtype, append, array
 
 
 def rv_options(description="RV", set_args=None):
@@ -248,11 +248,20 @@ class Star(object):
         """Make sure that the flags are self-consistent.
         """
         if self._valid_flags is None:
-            self._valid_flags = ((self.ORstarflag ==
-                                  bitwise_or.reduce(self.visitstarflag))
-                                 and
-                                 (self.ANDstarflag ==
-                                  bitwise_and.reduce(self.visitstarflag)))
+            #
+            # numpy.bitwise_and.identity = 1, so numpy.bitwise_and.reduce
+            # doesn't work as expected.
+            # Looks like this is fixed in bleeding-edge versions of numpy,
+            # but for now...
+            #
+            n = self.visitstarflag.size
+            o = self.visitstarflag[0]
+            a = self.visitstarflag[0]
+            for i in range(1,n):
+                o |= self.visitstarflag[i]
+                a &= self.visitstarflag[i]
+            self._valid_flags = ((self.ORstarflag == o)) and
+                                 (self.ANDstarflag == a))
         return self._valid_flags
 
     @property
