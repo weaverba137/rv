@@ -511,6 +511,7 @@ def create_index(stars, ncol=6):
     from collections import OrderedDict
     from jinja2 import Environment, PackageLoader
     tables = OrderedDict()
+    starflag = APOGEE_STARFLAG()
     for s in stars:
         stuple = (stars[s].tmassid,
                   stars[s].teff,
@@ -518,8 +519,7 @@ def create_index(stars, ncol=6):
                   stars[s].mh,
                   stars[s].sas,
                   stars[s].cas,
-                  stars[s].ANDstarflag,
-                  stars[s].ORstarflag,)
+                  ", ".join(starflag.flagname(stars[s].ORstarflag)),)
         if stars[s].locid in tables:
             tables[stars[s].locid].append(stuple)
         else:

@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import matplotlib
 matplotlib.use('Agg')
-matplotlib.rcParams['figure.figsize'] = (10.0, 10.0)
+matplotlib.rcParams['figure.figsize'] = (5.0, 5.0)
 
 
 def diagnostic_plots(stars, options):
@@ -82,7 +82,7 @@ def rv_plot(data, fits, options):
 
     Parameters
     ----------
-    data : :class:`dict`
+    data : :class:`~rv.util.Star`
         The data on an individual star.
     fits : :class:`list`
         The fitted curves produced by :func:`~rv.fitter.fitter`.
@@ -131,10 +131,22 @@ def rv_plot(data, fits, options):
     # leg = ax.legend(loc=1, prop=legendfont, numpoints=1)
     foo = ax.set_xticklabels([])
     ax = fig.add_subplot(212)
-    p0 = ax.plot(data.mjd, data.snr, 'ks')
+    # p0 = ax.plot(data.mjd, data.snr, 'ks')
+    p0 = ax.errorbar(data.mjd, data.synthvhelio, yerr=data.synthvrelerr,
+                     fmt='ks')
+    p1 = ax.plot([data.mjd[0], data.mjd[-1]],
+                 [data.synthvhelio_avg, data.synthvhelio_avg], 'b-')
+    p2 = ax.plot([data.mjd[0], data.mjd[-1]],
+                 [data.synthvhelio_avg+data.synthvscatter,
+                  data.synthvhelio_avg+data.synthvscatter], 'b--')
+    p3 = ax.plot([data.mjd[0], data.mjd[-1]],
+                 [data.synthvhelio_avg-data.synthvscatter,
+                  data.synthvhelio_avg-data.synthvscatter], 'b--')
     foo = ax.set_xlabel('MJD - {0:d}'.format(data.mjd_zero),
                         fontproperties=titlefont)
-    foo = ax.set_ylabel('S/N', fontproperties=titlefont)
+    # foo = ax.set_ylabel('S/N', fontproperties=titlefont)
+    foo = ax.set_ylabel('Synth. Heliocentric Velocity [km/s]',
+                        fontproperties=titlefont)
     foo = ax.grid(True)
     fig.savefig(join(options.plotDir, data.apstar_id+'.png'))
     fig.clf()
