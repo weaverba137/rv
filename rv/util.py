@@ -6,6 +6,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 from numpy import issubdtype, append, array
+from astropy.extern.six import string_types
 
 
 #
@@ -47,6 +48,29 @@ def flagname(value):
     names = [APOGEE_STARFLAG[bit][0] for bit in range(len(APOGEE_STARFLAG))
              if (value & (1 << bit)) != 0]
     return tuple(names)
+
+
+def flagval(name):
+    """Convert a name or set of names into a bitmask value.
+
+    Parameters
+    ----------
+    name : :class:`str` or iterable.
+        Name(s) of flags to convert.
+
+    Returns
+    -------
+    :class:`int`
+        The value of the mask
+    """
+    if isinstance(name, string_types):
+        name = [name]
+    names = set(name)
+    value = 0
+    for k in range(len(APOGEE_STARFLAG)):
+        if APOGEE_STARFLAG[k][0] in names:
+            value += 2**k
+    return value
 
 
 def rv_options(description="RV", set_args=None):
@@ -298,7 +322,7 @@ class Star(object):
             n = self.visitstarflag.size
             o = self.visitstarflag[0]
             a = self.visitstarflag[0]
-            for i in range(1,n):
+            for i in range(1, n):
                 o |= self.visitstarflag[i]
                 a &= self.visitstarflag[i]
             self._valid_flags = ((self.ORstarflag == o) and
