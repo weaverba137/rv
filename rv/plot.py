@@ -8,13 +8,6 @@ from __future__ import (absolute_import, division, print_function,
 import matplotlib
 matplotlib.use('Agg')
 matplotlib.rcParams['figure.figsize'] = (10.0, 10.0)
-import matplotlib.pyplot as plt
-from matplotlib.font_manager import fontManager, FontProperties
-#
-# Configure plots
-#
-legendfont = FontProperties(size='medium')
-titlefont = FontProperties(size='x-large')
 
 
 def diagnostic_plots(stars, options):
@@ -28,7 +21,11 @@ def diagnostic_plots(stars, options):
         Command-line options.
     """
     from numpy import array, hypot, arctan2, pi
+    import matplotlib.pyplot as plt
+    from matplotlib.font_manager import FontProperties
     from os.path import join
+    legendfont = FontProperties(size='medium')
+    titlefont = FontProperties(size='x-large')
     max_mjd = array([stars[s].mjd[-1] for s in stars])
     min_mjd = array([stars[s].mjd[0] for s in stars])
     delta_mjd = max_mjd - min_mjd
@@ -100,6 +97,10 @@ def rv_plot(data, fits, options):
     from os.path import join
     from numpy import array, argsort, linspace
     from .model import model
+    import matplotlib.pyplot as plt
+    from matplotlib.font_manager import FontProperties
+    legendfont = FontProperties(size='medium')
+    titlefont = FontProperties(size='x-large')
     good_fits = [f for f in fits if f.success]
     chi = array([f.fun for f in fits if f.success])
     k = argsort(chi)
@@ -161,6 +162,7 @@ def inthist(foo, show=False, color='w'):
         bins, respectively.
     """
     import numpy as np
+    import matplotlib.pyplot as plt
     xmin = min(foo)
     xmax = max(foo)
     x = np.arange(xmin, xmax+1)
