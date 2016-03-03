@@ -11,6 +11,11 @@ from astropy.extern.six import string_types
 
 class BitMask(object):
     """Base class for specific bitmask objects.
+
+    Attributes
+    ----------
+    bits : :func:`tuple`
+        The individual bits.
     """
     bits = (('UNUSED_00', "Unused"))
 
@@ -56,6 +61,11 @@ class BitMask(object):
 
 class APOGEE_STARFLAG(BitMask):
     """APOGEE star-level mask bits.
+
+    Attributes
+    ----------
+    bits : :func:`tuple`
+        The individual bits.
     """
 
     bits = (('BAD_PIXELS', "Spectrum has many bad pixels (>40%): BAD"),
@@ -340,13 +350,19 @@ class Star(object):
             # Looks like this is fixed in bleeding-edge versions of numpy,
             # but for now...
             #
+            sf = APOGEE_STARFLAG()
             n = self.visitstarflag.size
             o = self.visitstarflag[0]
             a = self.visitstarflag[0]
             for i in range(1, n):
                 o |= self.visitstarflag[i]
                 a &= self.visitstarflag[i]
-            self._valid_flags = ((self.ORstarflag == o) and
+            o2 = o | sf.flagval('SUSPECT_RV_COMBINATION')
+            o3 = o | sf.flagval('SUSPECT_BROAD_LINES')
+            self._valid_flags = (((self.ORstarflag == o) or
+                                  (self.ORstarflag == o2) or
+                                  (self.ORstarflag == o3) or
+                                  (self.ORstarflag == (o2 | o3))) and
                                  (self.ANDstarflag == a))
         return self._valid_flags
 
