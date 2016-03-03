@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import matplotlib
 matplotlib.use('Agg')
-matplotlib.rcParams['figure.figsize'] = (5.0, 5.0)
+matplotlib.rcParams['figure.figsize'] = (10.0, 10.0)
 
 
 def diagnostic_plots(stars, options):
