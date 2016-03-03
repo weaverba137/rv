@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import re
 import numpy as np
-from ..util import rv_options
+from ..util import APOGEE_STARFLAG, flagname, rv_options
 
 
 class TestUtil(object):
@@ -25,3 +25,10 @@ class TestUtil(object):
                                        '--zero', '50000'])
         assert options.method == 'foobar'
         assert options.mjd_zero == 50000
+
+    def test_flagname(self):
+        """Test the interpretation of APOGEE_STARFLAG values.
+        """
+        assert flagname(1) == (APOGEE_STARFLAG[0][0],)
+        assert flagname(2) == (APOGEE_STARFLAG[1][0],)
+        assert flagname(3) == (APOGEE_STARFLAG[0][0], APOGEE_STARFLAG[1][0])

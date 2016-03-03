@@ -8,6 +8,47 @@ from __future__ import (absolute_import, division, print_function,
 from numpy import issubdtype, append, array
 
 
+#
+# APOGEE star-level mask bits.
+#
+APOGEE_STARFLAG = (('BAD_PIXELS', "Spectrum has many bad pixels (>40%): BAD"),
+                   ('COMMISSIONING', "Commissioning data (MJD<55761), non-standard configuration, poor LSF: WARN"),
+                   ('BRIGHT_NEIGHBOR', "Star has neighbor more than 10 times brighter: WARN"),
+                   ('VERY_BRIGHT_NEIGHBOR', "Star has neighbor more than 100 times brighter: BAD"),
+                   ('LOW_SNR', "Spectrum has low S/N (S/N<5): BAD"),
+                   ('UNUSED_05', "Unused"),
+                   ('UNUSED_06', "Unused"),
+                   ('UNUSED_07', "Unused"),
+                   ('UNUSED_08', "Unused"),
+                   ('PERSIST_HIGH', "Spectrum has significant number (>20%) of pixels in high persistence region: WARN"),
+                   ('PERSIST_MED', "Spectrum has significant number (>20%) of pixels in medium persistence region: WARN"),
+                   ('PERSIST_LOW', "Spectrum has significant number (>20%) of pixels in low persistence region: WARN"),
+                   ('PERSIST_JUMP_POS', "Spectrum show obvious positive jump in blue chip: WARN"),
+                   ('PERSIST_JUMP_NEG', "Spectrum show obvious negative jump in blue chip: WARN"),
+                   ('UNUSED_14', "Unused"),
+                   ('UNUSED_15', "Unused"),
+                   ('SUSPECT_RV_COMBINATION', "WARNING: RVs from synthetic template differ significantly from those from combined template"),
+                   ('SUSPECT_BROAD_LINES',  "WARNING: cross-correlation peak with template significantly broader than autocorrelation of template"),)
+
+
+def flagname(value):
+    """Convert a flag value into readable names.
+
+    Parameters
+    ----------
+    value : :class:`int`
+        Mask value.
+
+    Returns
+    -------
+    :func:`tuple`
+        The names of the flags.
+    """
+    names = [APOGEE_STARFLAG[bit][0] for bit in range(len(APOGEE_STARFLAG))
+             if (value & (1 << bit)) != 0]
+    return tuple(names)
+
+
 def rv_options(description="RV", set_args=None):
     """Set the options typically used by rv.
 
