@@ -9,11 +9,12 @@ class TestRV(object):
     """
 
     def setup(self):
-        self.versionre = re.compile(r'''([0-9]+!)?  # epoch
-                                        ([0-9]+)    # major
-                                        (\.[0-9]+)* # minor
-                                        ((a|b|rc|\.post|\.dev)[0-9]+)?''',
-                                        re.X)
+        self.versionre = re.compile(r'''
+                                    ([0-9]+!)?  # epoch
+                                    ([0-9]+)    # major
+                                    (\.[0-9]+)* # minor
+                                    ((a|b|rc|\.post|\.dev)[0-9]+)?''',
+                                    re.X)
 
     def teardown(self):
         pass

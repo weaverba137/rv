@@ -22,11 +22,13 @@ try:
 except ImportError:
     __githash__ = ''
 
+
 # set up the test command
 def _get_test_runner():
     import os
     from astropy.tests.helper import TestRunner
     return TestRunner(os.path.dirname(__file__))
+
 
 def test(package=None, test_path=None, args=None, plugins=None,
          verbose=False, pastebin=None, remote_data=False, pep8=False,
@@ -113,7 +115,7 @@ def test(package=None, test_path=None, args=None, plugins=None,
 if not _ASTROPY_SETUP_:
     import os
     from warnings import warn
-    from astropy import config
+    import astropy.config.configuration as cf
 
     # add these here so we only need to cleanup the namespace at the end
     config_dir = None
@@ -123,16 +125,16 @@ if not _ASTROPY_SETUP_:
         config_template = os.path.join(config_dir, __package__ + ".cfg")
         if os.path.isfile(config_template):
             try:
-                config.configuration.update_default_config(
-                    __package__, config_dir, version=__version__)
+                cf.update_default_config(__package__, config_dir,
+                                         version=__version__)
             except TypeError as orig_error:
                 try:
-                    config.configuration.update_default_config(
-                        __package__, config_dir)
-                except config.configuration.ConfigurationDefaultMissingError as e:
-                    wmsg = (e.args[0] + " Cannot install default profile. If you are "
+                    cf.update_default_config(__package__, config_dir)
+                except cf.ConfigurationDefaultMissingError as e:
+                    wmsg = (e.args[0] +
+                            " Cannot install default profile. If you are "
                             "importing from source, this is expected.")
-                    warn(config.configuration.ConfigurationDefaultMissingWarning(wmsg))
+                    warn(cf.ConfigurationDefaultMissingWarning(wmsg))
                     del e
                 except:
                     raise orig_error

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import re
 import numpy as np
-from ..util import APOGEE_STARFLAG, flagname, flagval, rv_options
+from ..util import APOGEE_STARFLAG, rv_options
 
 
 class TestUtil(object):
@@ -10,7 +10,7 @@ class TestUtil(object):
     """
 
     def setup(self):
-        pass
+        self.starflag = APOGEE_STARFLAG()
 
     def teardown(self):
         pass
@@ -29,13 +29,15 @@ class TestUtil(object):
     def test_flagname(self):
         """Test the interpretation of APOGEE_STARFLAG values.
         """
-        assert flagname(1) == (APOGEE_STARFLAG[0][0],)
-        assert flagname(2) == (APOGEE_STARFLAG[1][0],)
-        assert flagname(3) == (APOGEE_STARFLAG[0][0], APOGEE_STARFLAG[1][0])
+        assert self.starflag.flagname(1) == (self.starflag.bits[0][0],)
+        assert self.starflag.flagname(2) == (self.starflag.bits[1][0],)
+        assert self.starflag.flagname(3) == (self.starflag.bits[0][0],
+                                             self.starflag.bits[1][0])
 
     def test_flagval(self):
         """Test the conversion of names into APOGEE_STARFLAG values.
         """
-        assert flagval(APOGEE_STARFLAG[0][0]) == 1
-        assert flagval(APOGEE_STARFLAG[1][0]) == 2
-        assert flagval((APOGEE_STARFLAG[0][0], APOGEE_STARFLAG[1][0])) == 3
+        assert self.starflag.flagval(self.starflag.bits[0][0]) == 1
+        assert self.starflag.flagval(self.starflag.bits[1][0]) == 2
+        assert self.starflag.flagval((self.starflag.bits[0][0],
+                                      self.starflag.bits[1][0])) == 3
