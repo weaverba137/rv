@@ -4,6 +4,7 @@ $(function () {
 //
 function replot() {
     var plot_area = $('#plot_area');
+    var synth_area = $('#synth_area');
     var SNR_area = $('#SNR_area')
     var plot_options = {
         "grid": {
@@ -34,6 +35,25 @@ function replot() {
             "interactive": true
         }
     };
+    var synth_options = {
+        "legend": {
+            "show": false
+        },
+        "selection": {
+            "mode": "xy"
+        },
+        "axisLabels": {
+            "show": true
+        },
+        "xaxis": xlim,
+        "yaxis": synthylim,
+        "xaxes": [{
+            "axisLabel": "MJD &ndash; " + mjd_zero
+        }],
+        "yaxes": [{
+            "axisLabel": "Synth. Heliocentric Velocity [km/s]"
+        }],
+    };
     var SNR_options = {
         "legend": {
             "show": false
@@ -53,6 +73,7 @@ function replot() {
         }]
     };
     var plot = $.plot(plot_area, rv, plot_options);
+    var plot3 = $.plot(synth_area, synthrv, synth_options);
     var plot2 = $.plot(SNR_area, snr, SNR_options);
     $("#calc").html("");
     var a1 = Math.sqrt(fit1_param[1]*fit1_param[1] + fit1_param[2]*fit1_param[2]);
@@ -130,6 +151,47 @@ function onDataReceived(data) {
             "shadowSize": 0
         }
     ];
+    synthrv = [
+        {
+            "data": [],
+            "color": "black",
+            "points": {
+                "show": true,
+                // "radius": 0,
+                "errorbars": "y",
+                "yerr": {
+                    "show": true,
+                    "upperCap": "-",
+                    "lowerCap": "-",
+                    "radius": 2
+                },
+            },
+            "lines": {"show": false}
+        },
+        {
+            "data": [[data.mjd[0], data.synthvhelio_avg], [data.mjd[data.mjd.length-1], data.synthvhelio_avg]],
+            "color": "blue",
+            "points": {"show": false},
+            "lines": {"show": true},
+            "shadowSize": 0
+        },
+        {
+            "data": [[data.mjd[0], data.synthvhelio_avg-data.synthvscatter], [data.mjd[data.mjd.length-1], data.synthvhelio_avg-data.synthvscatter]],
+            "color": "blue",
+            "points": {"show": false},
+            "lines": {"show": false},
+            "dashes": {"show": true},
+            "shadowSize": 0
+        },
+        {
+            "data": [[data.mjd[0], data.synthvhelio_avg+data.synthvscatter], [data.mjd[data.mjd.length-1], data.synthvhelio_avg+data.synthvscatter]],
+            "color": "blue",
+            "points": {"show": false},
+            "lines": {"show": false},
+            "dashes": {"show": true},
+            "shadowSize": 0
+        }
+    ];
     snr = [
         {
             "data": [],
@@ -140,6 +202,7 @@ function onDataReceived(data) {
     ];
     xlim = {"min":99999, "max":-99999, "panRange":[0,0], "zoomRange":[0.1,10]};
     ylim = {"min":99999, "max":-99999, "panRange":[0,0], "zoomRange":[0.1,10]};
+    synthylim = {"min":99999, "max":-99999};
     for (var i=0; i<data.mjd.length; i++) {
         if (data.mjd[i] < xlim.min) xlim.min = data.mjd[i];
         if (data.mjd[i] > xlim.max) xlim.max = data.mjd[i];
@@ -148,6 +211,11 @@ function onDataReceived(data) {
         m = data.vhelio[i]+data.vrelerr[i];
         if (m > ylim.max) ylim.max = m;
         rv[0].data.push([data.mjd[i],data.vhelio[i],data.vrelerr[i]]);
+        m = data.synthvhelio[i]-data.synthvrelerr[i];
+        if (m < synthylim.min) synthylim.min = m;
+        m = data.synthvhelio[i]+data.synthvrelerr[i];
+        if (m > synthylim.max) synthylim.max = m;
+        synthrv[0].data.push([data.mjd[i],data.synthvhelio[i],data.synthvrelerr[i]]);
         snr[0].data.push([data.mjd[i],data.snr[i]])
     }
     xlim.min = xlim.min - 5;
@@ -158,10 +226,13 @@ function onDataReceived(data) {
     ylim.max = ylim.max + 0.5;
     ylim.panRange[0] = ylim.min - 1.0;
     ylim.panRange[1] = ylim.max + 1.0;
+    synthylim.min = synthylim.min - 0.5;
+    synthylim.max = synthylim.max + 0.5;
     mjd_zero = data.mjd_zero;
     fit1_param = data.fit1_param;
     fit2_param = data.fit2_param;
     visits = data.visits;
+    visitstarflag = data.visitstarflag;
 }
 //
 //
@@ -186,7 +257,8 @@ function showTooltip(item) {
     var contents = "Time: " + item.datapoint[0].toFixed(2) + " d<br/>RV: " +
         item.datapoint[1].toFixed(2) + " &pm; " +
         item.datapoint[2].toFixed(2) + " km/s<br/>Visit: " +
-        visits[item.dataIndex];
+        visits[item.dataIndex] + "<br/>Flags: " +
+        visitstarflag[item.dataIndex].join(", ");
     var tooltip_css = {
         position: 'absolute',
         display: 'none',
@@ -237,10 +309,13 @@ function handle_click(event, pos, item) {
 // "Global" variables.
 //
 var rv = [];
+var synthrv = [];
 var snr = [];
 var visits = [];
+var visitstarflag = [];
 var xlim = null;
 var ylim = null;
+var synthylim = null;
 var mjd_zero = 0;
 var Q = 0;
 var fit1_param = [];

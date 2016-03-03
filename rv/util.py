@@ -386,6 +386,7 @@ class Star(object):
         JSON format.
         """
         if self._json_data is None:
+            sf = APOGEE_STARFLAG()
             self._json_data = dict()
             self._json_data['mjd_zero'] = self.mjd_zero
             self._json_data['apstar_id'] = self.apstar_id
@@ -402,7 +403,8 @@ class Star(object):
             self._json_data['visits'] = self.visits.tolist()
             self._json_data['snr'] = self.snr.tolist()
             self._json_data['mjd'] = self.mjd.tolist()
-            self._json_data['visitstarflag'] = self.visitstarflag.tolist()
+            self._json_data['visitstarflag'] = map(sf.flagname,
+                                                   self.visitstarflag)
             self._json_data['vhelio'] = self.vhelio.tolist()
             self._json_data['vrelerr'] = self.vrelerr.tolist()
             self._json_data['synthvhelio'] = self.synthvhelio.tolist()
