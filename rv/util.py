@@ -260,7 +260,7 @@ class Star(object):
             for i in range(1,n):
                 o |= self.visitstarflag[i]
                 a &= self.visitstarflag[i]
-            self._valid_flags = ((self.ORstarflag == o)) and
+            self._valid_flags = ((self.ORstarflag == o) and
                                  (self.ANDstarflag == a))
         return self._valid_flags
 
