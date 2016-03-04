@@ -350,13 +350,16 @@ class Star(object):
             # Looks like this is fixed in bleeding-edge versions of numpy,
             # but for now...
             #
+            # The overall flag is based on *all* the observations, not just
+            # the clean ones.
+            #
             sf = APOGEE_STARFLAG()
-            n = self.visitstarflag.size
-            o = self.visitstarflag[0]
-            a = self.visitstarflag[0]
+            n = self._visitstarflag_list.size
+            o = self._visitstarflag_list[0]
+            a = self._visitstarflag_list[0]
             for i in range(1, n):
-                o |= self.visitstarflag[i]
-                a &= self.visitstarflag[i]
+                o |= self._visitstarflag_list[i]
+                a &= self._visitstarflag_list[i]
             o2 = o | sf.flagval('SUSPECT_RV_COMBINATION')
             o3 = o | sf.flagval('SUSPECT_BROAD_LINES')
             self._valid_flags = (((self.ORstarflag == o) or
