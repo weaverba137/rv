@@ -450,13 +450,18 @@ class Star(object):
         return self
 
 
-def rv_data(options):
+def rv_data(options, pickleFile='apogee_vrel.pickle',
+            dataFile='apogee_vrel_v2_weaver.fit'):
     """Load RV data.
 
     Parameters
     ----------
     options : :class:`~argparse.Namespace`
         Command-line options.
+    pickleFile : :class:`str`, optional
+        Name of the cache file.  Defaults to 'apogee_vrel.pickle'.
+    dataFile : :class:`str`, optional
+        Name of FITS file.  Defaults to 'apogee_vrel_v2_weaver.fit'.
 
     Returns
     -------
@@ -471,12 +476,12 @@ def rv_data(options):
     #
     #
     #
-    f = join(options.plotDir, 'apogee_vrel.pickle')
+    f = join(options.plotDir, pickleFile)
     if exists(f) and not options.clobber:
         with open(f) as p:
             stars = pickle.load(p)
     else:
-        fit = join(options.plotDir, 'apogee_vrel_v2_weaver.fit')
+        fit = join(options.plotDir, dataFile)
         hdulist = pyfits.open(fit)
         data = hdulist[1].data
         hdulist.close()

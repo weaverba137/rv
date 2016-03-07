@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="robots" content="noindex" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>APOGEE Radial Velocities</title>
+        <style type="text/css">
+img {display: block; width: 200px; height: 200px;}
+td {text-align: center;}
+        </style>
+    </head>
+    <body>
+        <h1>APOGEE Radial Velocities</h1>
+        <h2 id="intro">Introduction</h2>
+        <p>Data were obtained with this query:</p>
+        <pre>
+SELECT aspcap.apstar_id, aspcap.teff, aspcap.logg, aspcap.param_m_h,
+  star.vhelio_avg, star.vscatter, star.verr, star.verr_med,
+  star.synthvhelio_avg, star.synthvscatter, star.synthverr, star.synthverr_med,
+  star.starflag AS ORstarflag, star.andflag AS ANDstarflag,
+  visit.visit_id, visit.ra, visit.dec, visit.glon, visit.glat,
+  visit.snr, visit.jd, visit.starflag AS visitstarflag,
+  visit.vhelio, visit.vrelerr,
+  visit.synthvhelio, visit.synthvrelerr
+INTO MyDB.apogee_vrel_v2
+FROM apogeeVisit     AS visit
+JOIN apogeeStarVisit AS starvisit ON visit.visit_id   = starvisit.visit_id
+JOIN aspcapStar      AS aspcap    ON aspcap.apstar_id = starvisit.apstar_id
+JOIN apogeeStar      AS star      ON star.apstar_id   = starvisit.apstar_id
+WHERE (aspcap.aspcapflag   &amp; dbo.fApogeeAspcapFlag('STAR_BAD')) = 0
+  AND (star.apogee_target1 &amp; dbo.fApogeeTarget1('APOGEE_LONG')) &gt; 0
+  AND aspcap.teff &gt; 0
+  AND star.nvisits &gt; 5
+ORDER BY aspcap.apstar_id, visit.jd;
+        </pre>
+        <h2 id="diag">Diagnostics</h2>
+        <table>
+            <thead></thead>
+            <tbody>
+                <tr>
+                    <td><a href="time.png"><img src="time.png" alt="Time Baseline" /></a></td>
+                    <td><a href="nvisit.png"><img src="nvisit.png" alt="Number of Visits" /></a></td>
+                    <td><a href="kappa-P.png"><img src="kappa-P.png" alt="Amplitude versus Period" /></a></td>
+                </tr>
+                <tr>
+                    <td>Histogram of RV time baselines.</td>
+                    <td>Histogram of number of visits.</td>
+                    <td>Plot of velocity amplitude <em>versus</em> orbital period.</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2 id="loc4128">4128</h2>
+        <table>
+            <thead>
+                <tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+            </thead>
+            <tbody>
+                
+                <tr>
+                    <td><strong>1</strong></td>
+                    
+                    <td>
+                    
+                        <a href="apogee.apo25m.s.stars.4128.2M13125428+1816071.png">
+                            <img src="apogee.apo25m.s.stars.4128.2M13125428+1816071.png" alt="apogee.apo25m.s.stars.4128.2M13125428+1816071" />
+
+                        </a><br />
+                        <var>T</var><sub>eff</sub> = 4888.93 K<br />
+                        log<sub>10</sub>&nbsp;<var>g</var> = 1.99<br />
+                        [M/H] = -2.17<br />
+                        APOGEE_STARFLAG:<br>
+                        BRIGHT_NEIGHBOR, PERSIST_LOW, SUSPECT_RV_COMBINATION<br />
+                        <a href="http://mirror.sdss3.org/irSpectrumDetail?locid=4128&amp;commiss=0&amp;apogeeid=2M13125428+1816071">SAS</a>&nbsp;&nbsp;<a href="http://skyserver.sdss.org/dr12/en/tools/explore/Summary.aspx?apid=apogee.apo25m.s.stars.4128.2M13125428+1816071">CAS</a>
+                    
+                    </td>
+                    
+                    <td>
+                    
+                    </td>
+                    
+                    <td>
+                    
+                    </td>
+                    
+                    <td>
+                    
+                    </td>
+                    
+                    <td>
+                    
+                    </td>
+                    
+                    <td>
+                    
+                    </td>
+                    
+                </tr>
+                
+            </tbody>
+        </table>
+        
+        <h2 id="loc4201">4201</h2>
+        <table>
+            <thead>
+                <tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+            </thead>
+            <tbody>
+                
+                <tr>
+                    <td><strong>1</strong></td>
+                    
+                    <td>
+                    
+                        <a href="apogee.apo25m.s.stars.4201.2M15163494-0017256.png">
+                            <img src="apogee.apo25m.s.stars.4201.2M15163494-0017256.png" alt="apogee.apo25m.s.stars.4201.2M15163494-0017256" />
+
+                        </a><br />
+                        <var>T</var><sub>eff</sub> = 5232.67 K<br />
+                        log<sub>10</sub>&nbsp;<var>g</var> = 2.73<br />
+                        [M/H] = -1.56<br />
+                        APOGEE_STARFLAG:<br>
+                        BRIGHT_NEIGHBOR, PERSIST_LOW, PERSIST_JUMP_POS, SUSPECT_RV_COMBINATION<br />
+                        <a href="http://mirror.sdss3.org/irSpectrumDetail?locid=4201&amp;commiss=0&amp;apogeeid=2M15163494-0017256">SAS</a>&nbsp;&nbsp;<a href="http://skyserver.sdss.org/dr12/en/tools/explore/Summary.aspx?apid=apogee.apo25m.s.stars.4201.2M15163494-0017256">CAS</a>
+                    
+                    </td>
+                    
+                    <td>
+                    
+                    </td>
+                    
+                    <td>
+                    
+                    </td>
+                    
+                    <td>
+                    
+                    </td>
+                    
+                    <td>
+                    
+                    </td>
+                    
+                    <td>
+                    
+                    </td>
+                    
+                </tr>
+                
+            </tbody>
+        </table>
+        
+    </body>
+</html>

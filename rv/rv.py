@@ -109,6 +109,6 @@ def data(locid, tmass_id, Q):
     return response
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     load_app_data()
     app.run(port=56789)  # , debug=True)
