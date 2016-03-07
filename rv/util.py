@@ -478,7 +478,7 @@ def rv_data(options, pickleFile='apogee_vrel.pickle',
     #
     f = join(options.plotDir, pickleFile)
     if exists(f) and not options.clobber:
-        with open(f) as p:
+        with open(f, 'rb') as p:
             stars = pickle.load(p)
     else:
         fit = join(options.plotDir, dataFile)
@@ -498,7 +498,7 @@ def rv_data(options, pickleFile='apogee_vrel.pickle',
         #
         # Save the data
         #
-        with open(f, 'w') as p:
+        with open(f, 'wb') as p:
             pickle.dump(stars, p)
     return stars
 
