@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 # -*- coding: utf-8 -*-
-import re
+import os
 import numpy as np
 from ..util import APOGEE_STARFLAG, flagname, flagval, rv_options
 
@@ -10,7 +10,7 @@ class TestUtil(object):
     """
 
     def setup(self):
-        pass
+        self.dataDir = os.path.join(os.path.dirname(__file__), 't')
 
     def teardown(self):
         pass
