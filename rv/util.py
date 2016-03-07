@@ -9,68 +9,99 @@ from numpy import issubdtype, append, array
 from astropy.extern.six import string_types
 
 
-#
-# APOGEE star-level mask bits.
-#
-APOGEE_STARFLAG = (('BAD_PIXELS', "Spectrum has many bad pixels (>40%): BAD"),
-                   ('COMMISSIONING', "Commissioning data (MJD<55761), non-standard configuration, poor LSF: WARN"),
-                   ('BRIGHT_NEIGHBOR', "Star has neighbor more than 10 times brighter: WARN"),
-                   ('VERY_BRIGHT_NEIGHBOR', "Star has neighbor more than 100 times brighter: BAD"),
-                   ('LOW_SNR', "Spectrum has low S/N (S/N<5): BAD"),
-                   ('UNUSED_05', "Unused"),
-                   ('UNUSED_06', "Unused"),
-                   ('UNUSED_07', "Unused"),
-                   ('UNUSED_08', "Unused"),
-                   ('PERSIST_HIGH', "Spectrum has significant number (>20%) of pixels in high persistence region: WARN"),
-                   ('PERSIST_MED', "Spectrum has significant number (>20%) of pixels in medium persistence region: WARN"),
-                   ('PERSIST_LOW', "Spectrum has significant number (>20%) of pixels in low persistence region: WARN"),
-                   ('PERSIST_JUMP_POS', "Spectrum show obvious positive jump in blue chip: WARN"),
-                   ('PERSIST_JUMP_NEG', "Spectrum show obvious negative jump in blue chip: WARN"),
-                   ('UNUSED_14', "Unused"),
-                   ('UNUSED_15', "Unused"),
-                   ('SUSPECT_RV_COMBINATION', "WARNING: RVs from synthetic template differ significantly from those from combined template"),
-                   ('SUSPECT_BROAD_LINES',  "WARNING: cross-correlation peak with template significantly broader than autocorrelation of template"),)
+class BitMask(object):
+    """Base class for specific bitmask objects.
 
-
-def flagname(value):
-    """Convert a flag value into readable names.
-
-    Parameters
+    Attributes
     ----------
-    value : :class:`int`
-        Mask value.
-
-    Returns
-    -------
-    :func:`tuple`
-        The names of the flags.
+    bits : :func:`tuple`
+        The individual bits.
     """
-    names = [APOGEE_STARFLAG[bit][0] for bit in range(len(APOGEE_STARFLAG))
-             if (value & (1 << bit)) != 0]
-    return tuple(names)
+    bits = (('UNUSED_00', "Unused"))
+
+    def flagname(self, value):
+        """Convert a flag value into readable names.
+
+        Parameters
+        ----------
+        value : :class:`int`
+            Mask value.
+
+        Returns
+        -------
+        :func:`tuple`
+            The names of the flags.
+        """
+        names = [self.bits[bit][0] for bit in range(len(self.bits))
+                 if (value & (1 << bit)) != 0]
+        return tuple(names)
+
+    def flagval(self, name):
+        """Convert a name or set of names into a bitmask value.
+
+        Parameters
+        ----------
+        name : :class:`str` or iterable.
+            Name(s) of flags to convert.
+
+        Returns
+        -------
+        :class:`int`
+            The value of the mask
+        """
+        if isinstance(name, string_types):
+            name = [name]
+        names = set(name)
+        value = 0
+        for bit in range(len(self.bits)):
+            if self.bits[bit][0] in names:
+                value += (1 << bit)
+        return value
 
 
-def flagval(name):
-    """Convert a name or set of names into a bitmask value.
+class APOGEE_STARFLAG(BitMask):
+    """APOGEE star-level mask bits.
 
-    Parameters
+    Attributes
     ----------
-    name : :class:`str` or iterable.
-        Name(s) of flags to convert.
-
-    Returns
-    -------
-    :class:`int`
-        The value of the mask
+    bits : :func:`tuple`
+        The individual bits.
     """
-    if isinstance(name, string_types):
-        name = [name]
-    names = set(name)
-    value = 0
-    for k in range(len(APOGEE_STARFLAG)):
-        if APOGEE_STARFLAG[k][0] in names:
-            value += 2**k
-    return value
+
+    bits = (('BAD_PIXELS', "Spectrum has many bad pixels (>40%): BAD"),
+            ('COMMISSIONING', ("Commissioning data (MJD<55761), " +
+                               "non-standard configuration, poor " +
+                               "LSF: WARN")),
+            ('BRIGHT_NEIGHBOR', "Star has neighbor more than 10 " +
+                                "times brighter: WARN"),
+            ('VERY_BRIGHT_NEIGHBOR', "Star has neighbor more than " +
+                                     "100 times brighter: BAD"),
+            ('LOW_SNR', "Spectrum has low S/N (S/N<5): BAD"),
+            ('UNUSED_05', "Unused"),
+            ('UNUSED_06', "Unused"),
+            ('UNUSED_07', "Unused"),
+            ('UNUSED_08', "Unused"),
+            ('PERSIST_HIGH', "Spectrum has significant number " +
+                             "(>20%) of pixels in high persistence " +
+                             "region: WARN"),
+            ('PERSIST_MED', "Spectrum has significant number " +
+                            "(>20%) of pixels in medium persistence " +
+                            "region: WARN"),
+            ('PERSIST_LOW', "Spectrum has significant number " +
+                            "(>20%) of pixels in low persistence " +
+                            "region: WARN"),
+            ('PERSIST_JUMP_POS', "Spectrum show obvious positive " +
+                                 "jump in blue chip: WARN"),
+            ('PERSIST_JUMP_NEG', "Spectrum show obvious negative " +
+                                 "jump in blue chip: WARN"),
+            ('UNUSED_14', "Unused"),
+            ('UNUSED_15', "Unused"),
+            ('SUSPECT_RV_COMBINATION', "WARNING: RVs from synthetic " +
+                                       "template differ significantly from " +
+                                       "those from combined template"),
+            ('SUSPECT_BROAD_LINES', "WARNING: cross-correlation peak with " +
+                                    "template significantly broader than " +
+                                    "autocorrelation of template"),)
 
 
 def rv_options(description="RV", set_args=None):
@@ -319,13 +350,22 @@ class Star(object):
             # Looks like this is fixed in bleeding-edge versions of numpy,
             # but for now...
             #
-            n = self.visitstarflag.size
-            o = self.visitstarflag[0]
-            a = self.visitstarflag[0]
+            # The overall flag is based on *all* the observations, not just
+            # the clean ones.
+            #
+            sf = APOGEE_STARFLAG()
+            n = self._visitstarflag_list.size
+            o = self._visitstarflag_list[0]
+            a = self._visitstarflag_list[0]
             for i in range(1, n):
-                o |= self.visitstarflag[i]
-                a &= self.visitstarflag[i]
-            self._valid_flags = ((self.ORstarflag == o) and
+                o |= self._visitstarflag_list[i]
+                a &= self._visitstarflag_list[i]
+            o2 = o | sf.flagval('SUSPECT_RV_COMBINATION')
+            o3 = o | sf.flagval('SUSPECT_BROAD_LINES')
+            self._valid_flags = (((self.ORstarflag == o) or
+                                  (self.ORstarflag == o2) or
+                                  (self.ORstarflag == o3) or
+                                  (self.ORstarflag == (o2 | o3))) and
                                  (self.ANDstarflag == a))
         return self._valid_flags
 
@@ -349,6 +389,7 @@ class Star(object):
         JSON format.
         """
         if self._json_data is None:
+            sf = APOGEE_STARFLAG()
             self._json_data = dict()
             self._json_data['mjd_zero'] = self.mjd_zero
             self._json_data['apstar_id'] = self.apstar_id
@@ -365,7 +406,8 @@ class Star(object):
             self._json_data['visits'] = self.visits.tolist()
             self._json_data['snr'] = self.snr.tolist()
             self._json_data['mjd'] = self.mjd.tolist()
-            self._json_data['visitstarflag'] = self.visitstarflag.tolist()
+            self._json_data['visitstarflag'] = map(sf.flagname,
+                                                   self.visitstarflag)
             self._json_data['vhelio'] = self.vhelio.tolist()
             self._json_data['vrelerr'] = self.vrelerr.tolist()
             self._json_data['synthvhelio'] = self.synthvhelio.tolist()
@@ -474,6 +516,7 @@ def create_index(stars, ncol=6):
     from collections import OrderedDict
     from jinja2 import Environment, PackageLoader
     tables = OrderedDict()
+    starflag = APOGEE_STARFLAG()
     for s in stars:
         stuple = (stars[s].tmassid,
                   stars[s].teff,
@@ -481,8 +524,7 @@ def create_index(stars, ncol=6):
                   stars[s].mh,
                   stars[s].sas,
                   stars[s].cas,
-                  stars[s].ANDstarflag,
-                  stars[s].ORstarflag,)
+                  ", ".join(starflag.flagname(stars[s].ORstarflag)),)
         if stars[s].locid in tables:
             tables[stars[s].locid].append(stuple)
         else:

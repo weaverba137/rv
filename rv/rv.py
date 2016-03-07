@@ -10,7 +10,7 @@ from flask import Flask, render_template, jsonify, request, json
 from werkzeug.contrib.cache import SimpleCache
 from .model import model, obj, dobj, d2obj
 from .fitter import fitter
-from .util import rv_options, rv_data
+from .util import APOGEE_STARFLAG, rv_options, rv_data
 
 
 app = Flask(__name__)
@@ -19,6 +19,7 @@ options = None
 stars = None
 locids = None
 tmass_ids = None
+starflag = APOGEE_STARFLAG()
 
 
 def load_app_data():
@@ -69,12 +70,14 @@ def star(locid, tmass_id):
     """
     apstar_id = 'apogee.apo25m.s.stars.{0:d}.{1}'.format(locid, tmass_id)
     data = stars[apstar_id]
+    flagtxt = ", ".join(starflag.flagname(stars[apstar_id].ORstarflag))
     return render_template('star.html',
                            title="RV - {0:d}.{1}".format(locid, tmass_id),
                            locids=locids, locid=locid,
                            stars=sorted(tmass_ids[locid]),
                            tmass_id=tmass_id,
-                           data=stars[apstar_id])
+                           data=stars[apstar_id],
+                           flags=flagtxt)
 
 
 @app.route("/<int:locid>/<tmass_id>/<int:Q>")

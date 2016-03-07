@@ -8,13 +8,6 @@ from __future__ import (absolute_import, division, print_function,
 import matplotlib
 matplotlib.use('Agg')
 matplotlib.rcParams['figure.figsize'] = (10.0, 10.0)
-import matplotlib.pyplot as plt
-from matplotlib.font_manager import fontManager, FontProperties
-#
-# Configure plots
-#
-legendfont = FontProperties(size='medium')
-titlefont = FontProperties(size='x-large')
 
 
 def diagnostic_plots(stars, options):
@@ -28,7 +21,11 @@ def diagnostic_plots(stars, options):
         Command-line options.
     """
     from numpy import array, hypot, arctan2, pi
+    import matplotlib.pyplot as plt
+    from matplotlib.font_manager import FontProperties
     from os.path import join
+    legendfont = FontProperties(size='medium')
+    titlefont = FontProperties(size='x-large')
     max_mjd = array([stars[s].mjd[-1] for s in stars])
     min_mjd = array([stars[s].mjd[0] for s in stars])
     delta_mjd = max_mjd - min_mjd
@@ -85,7 +82,7 @@ def rv_plot(data, fits, options):
 
     Parameters
     ----------
-    data : :class:`dict`
+    data : :class:`~rv.util.Star`
         The data on an individual star.
     fits : :class:`list`
         The fitted curves produced by :func:`~rv.fitter.fitter`.
@@ -100,6 +97,10 @@ def rv_plot(data, fits, options):
     from os.path import join
     from numpy import array, argsort, linspace
     from .model import model
+    import matplotlib.pyplot as plt
+    from matplotlib.font_manager import FontProperties
+    legendfont = FontProperties(size='medium')
+    titlefont = FontProperties(size='x-large')
     good_fits = [f for f in fits if f.success]
     chi = array([f.fun for f in fits if f.success])
     k = argsort(chi)
@@ -130,10 +131,22 @@ def rv_plot(data, fits, options):
     # leg = ax.legend(loc=1, prop=legendfont, numpoints=1)
     foo = ax.set_xticklabels([])
     ax = fig.add_subplot(212)
-    p0 = ax.plot(data.mjd, data.snr, 'ks')
+    # p0 = ax.plot(data.mjd, data.snr, 'ks')
+    p0 = ax.errorbar(data.mjd, data.synthvhelio, yerr=data.synthvrelerr,
+                     fmt='ks')
+    p1 = ax.plot([data.mjd[0], data.mjd[-1]],
+                 [data.synthvhelio_avg, data.synthvhelio_avg], 'b-')
+    p2 = ax.plot([data.mjd[0], data.mjd[-1]],
+                 [data.synthvhelio_avg+data.synthvscatter,
+                  data.synthvhelio_avg+data.synthvscatter], 'b--')
+    p3 = ax.plot([data.mjd[0], data.mjd[-1]],
+                 [data.synthvhelio_avg-data.synthvscatter,
+                  data.synthvhelio_avg-data.synthvscatter], 'b--')
     foo = ax.set_xlabel('MJD - {0:d}'.format(data.mjd_zero),
                         fontproperties=titlefont)
-    foo = ax.set_ylabel('S/N', fontproperties=titlefont)
+    # foo = ax.set_ylabel('S/N', fontproperties=titlefont)
+    foo = ax.set_ylabel('Synth. Heliocentric Velocity [km/s]',
+                        fontproperties=titlefont)
     foo = ax.grid(True)
     fig.savefig(join(options.plotDir, data.apstar_id+'.png'))
     fig.clf()
@@ -161,6 +174,7 @@ def inthist(foo, show=False, color='w'):
         bins, respectively.
     """
     import numpy as np
+    import matplotlib.pyplot as plt
     xmin = min(foo)
     xmax = max(foo)
     x = np.arange(xmin, xmax+1)
